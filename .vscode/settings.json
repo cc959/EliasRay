@@ -1,0 +1,9 @@
+{
+	"cmake.configureOnOpen": false,
+	"files.associations": {
+		"*.soitask": "stoml",
+		"thread": "cpp",
+		"complex": "cpp",
+		"valarray": "cpp"
+	}
+}
