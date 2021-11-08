@@ -7,6 +7,11 @@ uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
 
+struct Light {
+	vec3 position;
+	vec3 color;
+};
+
 vec2 random2(vec2 p) {
 	return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
 }
@@ -53,20 +58,10 @@ float voronoi(vec2 fc) {
 	return sqrt(m_dist);
 }
 
-float noise(vec2 fc) {
-	vec2 st = fc / u_resolution.xy;
-	st.x *= u_resolution.x / u_resolution.y;
 
-	vec2 i = floor(st);
-	vec2 f = fract(st);
-
-	vec2 u = f * f * (3.0 - 2.0 * f);
-
-	return mix(mix(dot(random2(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)), dot(random2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x), mix(dot(random2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)), dot(random2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
-}
 
 float getVal(vec2 fc) {
-	return voronoi(voronoi(fc) * fc + fc);
+	return voronoi(fc * voronoi(fc) + fc);
 }
 
 vec2 trans(vec2 fc) {
@@ -75,34 +70,37 @@ vec2 trans(vec2 fc) {
 	return st;
 }
 
-vec3 hsv2rgb(in vec3 c) {
-	vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
-	rgb = rgb * rgb * (3.0 - 2.0 * rgb);
-	return c.z * mix(vec3(1.0), rgb, c.y);
-}
+
+//const int nl = 2;
+
+//Light lights[nl] = Light[nl] (Light(vec3(-5, 5, 0.1), vec3(1, 0.12, 0.81)), Light(vec3(5, -1, 0.1), vec3(0, 0.07, 1)));
 
 void main() {
 	vec2 fc = gl_FragCoord.xy;
-	vec3 color = vec3(fc / u_resolution.xy, 0.5) * 2;//vec3(0.88, 0, 1);
 
 	float pos = getVal(fc);
 	float right = getVal(fc + vec2(3, 0));
 	float front = getVal(fc + vec2(0, 3));
 
     // Visualize the distance field
-	vec3 c = color;
+	vec3 baseColor = vec3(1) * pos;
 
-	vec3 lightColor = vec3(1);//hsv2rgb(vec3(pow(sin(u_time / 10.f), 2), 1, 1));
-	vec3 tangent = normalize(vec3(0.1, 0, right - pos));
-	vec3 bitangent = normalize(vec3(0, 0.1, front - pos));
+	vec3 tangent = normalize(vec3(0.05, 0, right - pos));
+	vec3 bitangent = normalize(vec3(0, 0.05, front - pos));
 	vec3 normal = cross(tangent, bitangent);
 
 	vec2 mousePos = vec2(trans(u_mouse.xy));
 
-	vec3 lightPos = vec3(mousePos, 0.1);
+	vec3 outColor = vec3(0);
+
+	vec3 lightColor = vec3(0, 1.42, 2);//lights[i].color;
+	vec3 lightPos = vec3(mousePos, 0.4);//lights[i].position;
 	vec3 lightDir = normalize(lightPos - vec3(trans(fc), 0));
+	outColor += baseColor * lightColor * pow(clamp(dot(normal, lightDir), 0, 1), 3);
 
-	c *= lightColor * clamp(dot(normal, lightDir), 0.1, 1);
+	// for(int i = 0; i < nl; i++) {
+		
+	// }
 
-	fragColor = vec4(c, 1);
+	fragColor = vec4(outColor, 1);
 }

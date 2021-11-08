@@ -41,7 +41,7 @@ const double pi = 3.14159265359;
 int main()
 {
 
-	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Shader", sf::Style::Default, sf::ContextSettings{24, 8, 0, 4, 6});
+	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Shader", sf::Style::Fullscreen, sf::ContextSettings{24, 8, 4, 4, 6});
 	//window.setVerticalSyncEnabled(true);
 
 	window.setActive(true);
