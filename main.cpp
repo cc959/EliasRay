@@ -7,171 +7,63 @@
 #include "shader.h"
 
 using namespace std;
-using namespace sf;
+//using namespace sf;
 using namespace std::complex_literals;
 
+// An quad covering the screen
+static const GLfloat g_vertex_buffer_data[] = {
+	-1.0f,
+	-1.0f,
+	0.0f,
+
+	1.0f,
+	-1.0f,
+	0.0f,
+
+	-1.0f,
+	1.0f,
+	0.0f,
+
+	1.0f,
+	-1.0f,
+	0.0f,
+
+	1.0f,
+	1.0f,
+	0.0f,
+
+	-1.0f,
+	1.0f,
+	0.0f,
+};
 const double pi = 3.14159265359;
-
-double herz = 440.0;
-
-struct NoiseMaker
-{
-	static double squareIfy(double in)
-	{
-		if (in > 0)
-			return 1;
-		else
-			return 0;
-	}
-
-	static double genSin(double dTime, double herz)
-	{
-
-		return sin(2 * pi * herz * dTime);
-	}
-
-	static double genSquare(double dTime, double herz)
-	{
-		dTime *= herz;
-		return (dTime - (long)dTime < 0.5) ? 1.0 : -1.0;
-	}
-
-	static double makeNoise(double dTime)
-	{
-		double out = genSin(dTime, herz);
-
-		return out;
-	}
-
-	NoiseMaker() = delete;
-};
-
-class SynthStream : public sf::SoundStream
-{
-	unsigned int sampleAt = 0, sampleRate, bufferSize;
-
-public:
-	void initialize(unsigned int sampleRate, unsigned int bufferSize)
-	{
-		sf::SoundStream::initialize(1, sampleRate);
-		this->sampleRate = sampleRate;
-		this->bufferSize = bufferSize;
-	}
-
-	virtual bool onGetData(Chunk &data)
-	{
-		vector<sf::Int16> samples(bufferSize);
-		for (int i = 0; i < bufferSize; i++)
-			samples[i] = sf::Int16(SHRT_MAX * NoiseMaker::makeNoise((sampleAt++) / double(sampleRate)));
-
-		data.samples = &samples[0];
-		data.sampleCount = bufferSize;
-
-		cout << sampleAt << "\n";
-		cout << herz << "\n";
-
-		return true;
-	}
-
-	virtual void onSeek(sf::Time timeOffset)
-	{
-	}
-};
-
-// load the .wav file and return samples between -1 and 1
-vector<short> loadSound(const string &path)
-{
-	SoundBuffer music;
-	music.loadFromFile(path);
-	auto point = music.getSamples();
-
-	cout << music.getSampleRate() << "\n";
-
-	vector<short> raw(point, point + music.getSampleCount());
-	vector<double> samples(raw.size());
-
-	for (int i = 0; i < raw.size(); i++)
-		samples[i] = raw[i] / double(SHRT_MAX);
-
-	return raw;
-}
-
-SoundBuffer bufferize()
-{
-}
-
-struct Arrow
-{
-	complex<double> c; // starting config
-	int herz;		   // herz
-};
-
-vector<Arrow> fourierSeries(vector<double> &samples, unsigned int detail)
-{
-	int N = samples.size();
-	int v = detail * 2 + 1;
-
-	vector<Arrow> series(v);
-
-	for (int i = 0; i < v; i++)
-	{
-		int n = i - detail;
-		for (int t = 0; t < N; t++)
-			series[i].c += exp(-2.0 * pi * 1i * double(n) * double(t)) * samples[t];
-		series[i].c /= N;
-		series[i].herz = n;
-	}
-	return series;
-}
-
-vector<double> reconstruct(vector<Arrow> &fourier, int sampleCount)
-{
-	vector<double> samples(sampleCount);
-	for (int i = 0; i < sampleCount; i++)
-	{
-		double t = i / double(sampleCount);
-		complex<double> pos;
-		for (Arrow arr : fourier)
-		{
-			pos += arr.c * exp(arr.herz * 2.0 * pi * 1i * t);
-		}
-		samples[i] = pos.real();
-	}
-	return samples;
-}
 
 int main()
 {
 
-	RenderWindow window(VideoMode(1000, 700), "Fourier", Style::Default, ContextSettings{24, 8, 4, 4, 6});
-	window.setVerticalSyncEnabled(true);
+	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Shader", sf::Style::Default, sf::ContextSettings{24, 8, 0, 4, 6});
+	//window.setVerticalSyncEnabled(true);
 
 	window.setActive(true);
 
-	auto raw = loadSound("res/hello.wav");
+	sf::Clock elapsedClock, frameClock;
 
-	//auto fourier = fourierSeries(samples, 100);
+	sf::Font fpsFont;
+	if (!fpsFont.loadFromFile("res/Fonts/Roboto-Medium.ttf"))
+		cout << "Error loading font\n";
 
-	//auto newsamples = samples; //reconstruct(fourier, samples.size());
+	glewInit();
 
-	// vector<short> raw(newsamples.size());
+	// This will identify our vertex buffer
+	GLuint vertexbuffer;
+	// Generate 1 buffer, put the resulting identifier in vertexbuffer
+	glGenBuffers(1, &vertexbuffer);
+	// The following commands will talk about our 'vertexbuffer' buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	// Give our vertices to OpenGL.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-	// for (int i = 0; i < newsamples.size(); i++)
-	// {
-	// 	raw[i] = newsamples[i] * SHRT_MAX;
-	// 	cout << samples[i] << " " << newsamples[i] << "\n";
-	// }
-
-	// SoundBuffer noise;
-	// noise.loadFromSamples(&raw[0], raw.size(), 1, 44100);
-	SoundBuffer noise;
-	noise.loadFromFile("res/hello.wav");
-
-	cout << "Playing sound\n";
-
-	Sound sound;
-	sound.setBuffer(noise);
-	sound.play();
+	Shader def("res/vert.glsl", "res/frag.glsl");
 
 	bool running = true;
 	while (running)
@@ -188,10 +80,65 @@ int main()
 			{
 				// adjust the viewport when the window is resized
 				glViewport(0, 0, event.size.width, event.size.height);
+				window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
 			}
 		}
 
+		float deltaTime = frameClock.getElapsedTime().asSeconds();
+		frameClock.restart();
+
+		float fps = 1.f / deltaTime;
+
+		def.reload();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glUseProgram(def);
+
+		glUniform1f(glGetUniformLocation(def, "u_time"), elapsedClock.getElapsedTime().asSeconds());
+		auto mousePos = sf::Mouse::getPosition(window);
+		glUniform2f(glGetUniformLocation(def, "u_mouse"), mousePos.x, window.getSize().y - mousePos.y);
+		glUniform2f(glGetUniformLocation(def, "u_resolution"), window.getSize().x, window.getSize().y);
+
+		// 1st attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,		  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			3,		  // size
+			GL_FLOAT, // type
+			GL_FALSE, // normalized?
+			0,		  // stride
+			(void *)0 // array buffer offset
+		);
+		// Draw the triangle !
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDisableVertexAttribArray(0);
+
+		window.pushGLStates();
+
+		sf::Text text;
+
+		// select the font
+		text.setFont(fpsFont); // font is a sf::Font
+
+		// set the string to display
+		//text.setString("Fps: " + std::to_string(fps));
+		string name((char *)glGetString(GL_VENDOR));
+
+		text.setString(name + " " + std::to_string(window.getSettings().antialiasingLevel) + "\nFps: " + std::to_string(fps));
+		// set the character size
+		text.setCharacterSize(24); // in pixels, not points!
+
+		// set the color
+		text.setFillColor(sf::Color::White);
+
+		// set the text style
+		text.setStyle(sf::Text::Bold);
+
+		// inside the main loop, between window.clear() and window.display()
+		window.draw(text);
+
+		window.popGLStates();
 
 		window.display();
 	}

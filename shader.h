@@ -7,18 +7,20 @@ class Shader
 {
 private:
 	GLuint ProgramID;
+	string vertex_file_path, fragment_file_path;
+	bool loadShader();
 
 public:
 	Shader(string vertex_file_path, string fragment_file_path);
+	void reload();
 	operator int() const;
 	//Delete the copy constructor/assignment.
 	Shader(const Shader &) = delete;
 	Shader &operator=(const Shader &) = delete;
 };
 
-Shader::Shader(string vertex_file_path, string fragment_file_path)
+bool Shader::loadShader()
 {
-
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -36,7 +38,7 @@ Shader::Shader(string vertex_file_path, string fragment_file_path)
 	else
 	{
 		cout << "Impossible to open " << vertex_file_path << " Are you in the right directory ? Don't forget to read the FAQ !\n";
-		return;
+		return false;
 	}
 
 	// Read the Fragment Shader code from the file
@@ -52,11 +54,12 @@ Shader::Shader(string vertex_file_path, string fragment_file_path)
 	else
 	{
 		cout << "Impossible to open " << fragment_file_path << " Are you in the right directory ? Don't forget to read the FAQ !\n";
-		return;
+		return false;
 	}
 
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
+	bool aok = true;
 
 	// Compile Vertex Shader
 	cout << "Compiling shader : " << vertex_file_path << "\n";
@@ -72,6 +75,7 @@ Shader::Shader(string vertex_file_path, string fragment_file_path)
 		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
 		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
 		printf("%s\n", &VertexShaderErrorMessage[0]);
+		aok = false;
 	}
 
 	// Compile Fragment Shader
@@ -88,6 +92,7 @@ Shader::Shader(string vertex_file_path, string fragment_file_path)
 		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
 		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
 		printf("%s\n", &FragmentShaderErrorMessage[0]);
+		aok = false;
 	}
 
 	// Link the program
@@ -105,6 +110,7 @@ Shader::Shader(string vertex_file_path, string fragment_file_path)
 		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
 		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 		printf("%s\n", &ProgramErrorMessage[0]);
+		aok = false;
 	}
 
 	glDetachShader(ProgramID, VertexShaderID);
@@ -112,6 +118,26 @@ Shader::Shader(string vertex_file_path, string fragment_file_path)
 
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
+
+	return aok;
+}
+
+Shader::Shader(string vertex_file_path, string fragment_file_path) : vertex_file_path(vertex_file_path), fragment_file_path(fragment_file_path)
+{
+	loadShader();
+}
+
+void Shader::reload()
+{
+	GLuint backupID = ProgramID;
+
+	if (!loadShader())
+	{
+		glDeleteProgram(ProgramID);
+		ProgramID = backupID;
+	}
+	else
+		glDeleteProgram(backupID);
 }
 
 Shader::operator int() const
