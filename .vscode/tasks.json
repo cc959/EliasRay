@@ -8,7 +8,7 @@
 			]
 		},
 		{
-			"type": "cppbuild",
+			"type": "shell",
 			"label": "C/C++: g++ build",
 			"command": "/usr/bin/g++",
 			"args": [
