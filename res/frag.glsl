@@ -58,8 +58,6 @@ float voronoi(vec2 fc) {
 	return sqrt(m_dist);
 }
 
-
-
 float getVal(vec2 fc) {
 	return voronoi(fc * voronoi(fc) + fc);
 }
@@ -70,7 +68,6 @@ vec2 trans(vec2 fc) {
 	return st;
 }
 
-
 //const int nl = 2;
 
 //Light lights[nl] = Light[nl] (Light(vec3(-5, 5, 0.1), vec3(1, 0.12, 0.81)), Light(vec3(5, -1, 0.1), vec3(0, 0.07, 1)));
@@ -79,8 +76,8 @@ void main() {
 	vec2 fc = gl_FragCoord.xy;
 
 	float pos = getVal(fc);
-	float right = getVal(fc + vec2(3, 0));
-	float front = getVal(fc + vec2(0, 3));
+	float right = getVal(fc + vec2(1, 0));
+	float front = getVal(fc + vec2(0, 1));
 
     // Visualize the distance field
 	vec3 baseColor = vec3(1) * pos;
@@ -99,7 +96,7 @@ void main() {
 	outColor += baseColor * lightColor * pow(clamp(dot(normal, lightDir), 0, 1), 3);
 
 	// for(int i = 0; i < nl; i++) {
-		
+
 	// }
 
 	fragColor = vec4(outColor, 1);
