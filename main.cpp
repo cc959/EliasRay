@@ -38,11 +38,16 @@ static const GLfloat g_vertex_buffer_data[] = {
 };
 const double pi = 3.14159265359;
 
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+{
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+}
+
 int main()
 {
 
 	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Shader", sf::Style::Fullscreen, sf::ContextSettings{24, 8, 4, 4, 6});
-	//window.setVerticalSyncEnabled(true);
+	window.setVerticalSyncEnabled(true);
 
 	window.setActive(true);
 
@@ -53,6 +58,8 @@ int main()
 		cout << "Error loading font\n";
 
 	glewInit();
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
 
 	// This will identify our vertex buffer
 	GLuint vertexbuffer;
@@ -89,7 +96,7 @@ int main()
 
 		float fps = 1.f / deltaTime;
 
-		def.reload();
+		//def.reload();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(def);

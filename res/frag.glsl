@@ -95,9 +95,5 @@ void main() {
 	vec3 lightDir = normalize(lightPos - vec3(trans(fc), 0));
 	outColor += baseColor * lightColor * pow(clamp(dot(normal, lightDir), 0, 1), 3);
 
-	// for(int i = 0; i < nl; i++) {
-
-	// }
-
 	fragColor = vec4(outColor, 1);
 }
