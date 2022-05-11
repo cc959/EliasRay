@@ -3,6 +3,8 @@
 out vec4 fragColor;
 #define PI 3.14159265359
 
+const float AA = 3;
+
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
@@ -72,18 +74,18 @@ vec2 trans(vec2 fc) {
 
 //Light lights[nl] = Light[nl] (Light(vec3(-5, 5, 0.1), vec3(1, 0.12, 0.81)), Light(vec3(5, -1, 0.1), vec3(0, 0.07, 1)));
 
-void main() {
-	vec2 fc = gl_FragCoord.xy;
+float delta = 0.01;
 
+vec3 render(vec2 fc) {
 	float pos = getVal(fc);
-	float right = getVal(fc + vec2(1, 0));
-	float front = getVal(fc + vec2(0, 1));
+	float right = getVal(fc + vec2(delta, 0));
+	float front = getVal(fc + vec2(0, delta));
 
     // Visualize the distance field
 	vec3 baseColor = vec3(1) * pos;
 
-	vec3 tangent = normalize(vec3(0.05, 0, right - pos));
-	vec3 bitangent = normalize(vec3(0, 0.05, front - pos));
+	vec3 tangent = normalize(vec3(0.05 * delta, 0, right - pos));
+	vec3 bitangent = normalize(vec3(0, 0.05 * delta, front - pos));
 	vec3 normal = cross(tangent, bitangent);
 
 	vec2 mousePos = vec2(trans(u_mouse.xy));
@@ -95,5 +97,19 @@ void main() {
 	vec3 lightDir = normalize(lightPos - vec3(trans(fc), 0));
 	outColor += baseColor * lightColor * pow(clamp(dot(normal, lightDir), 0, 1), 3);
 
-	fragColor = vec4(outColor, 1);
+	return outColor;
+}
+
+void main() {
+	vec2 fc = gl_FragCoord.xy;
+
+	vec3 outColor = vec3(0, 0, 0);//render(fc) + render(fc + vec2(0.5, 0)) + render(fc + vec2(0, 0.5)) + render(fc + vec2(0.5, 0.5));
+
+	for(float x = 0.f; x < 1.f; x += 1.f / AA) {
+		for(float y = 0.f; y < 1.f; y += 1.f / AA) {
+			outColor += render(fc + vec2(x, y));
+		}
+	}
+
+	fragColor = vec4(outColor / (AA * AA), 1);
 }

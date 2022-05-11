@@ -9,10 +9,11 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/Build/main",
-			"args": [
-				"__NV_PRIME_RENDER_OFFLOAD=1",
-				"__GLX_VENDOR_LIBRARY_NAME=nvidia"
-			],
+			// "program": "/usr/bin/bash",
+			// "args": [
+			// 	"-c",
+			// 	"prime-run ${workspaceFolder}/Build/main"
+			// ],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
 			"environment": [],
