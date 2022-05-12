@@ -1,4 +1,4 @@
-args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -lcurl
+args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window
 
 CXX = gcc # Flag for implicit rules
 CXXFLAGS = -g -I ./ $(args) # Flag for implicit rules. Turn on debug info

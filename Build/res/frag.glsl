@@ -3,7 +3,7 @@
 out vec4 fragColor;
 #define PI 3.14159265359
 
-const float AA = 3;
+const float AA = 2;
 
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
