@@ -3,7 +3,7 @@
 out vec4 fragColor;
 #define PI 3.14159265359
 
-const float AA = 3;
+const float AA = 2;
 
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
@@ -103,7 +103,7 @@ vec3 render(vec2 fc) {
 void main() {
 	vec2 fc = gl_FragCoord.xy;
 
-	vec3 outColor = vec3(0, 0, 0);//render(fc) + render(fc + vec2(0.5, 0)) + render(fc + vec2(0, 0.5)) + render(fc + vec2(0.5, 0.5));
+	vec3 outColor = vec3(0);
 
 	for(float x = 0.f; x < 1.f; x += 1.f / AA) {
 		for(float y = 0.f; y < 1.f; y += 1.f / AA) {
