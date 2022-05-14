@@ -83,7 +83,7 @@ mat3 randomRot(float scatter, vec3 seed) {
 
 float sdSphere(vec3 pos, float r, vec3 sp) {
 	vec3 d = pos - sp;
-	if(length(d.xz) < 25)
+	if(max(abs(d.x), abs(d.z)) < 17.5)
 		d.xz = mod(d.xz + 2.5, 5) - 2.5;
 	return length(d) - r;
 }
@@ -162,7 +162,7 @@ Hit march(Ray ray) {
 		}
 
 		if(++cnt > maxsteps || d.dist > 1.f / eps)
-			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction) * (sin(u_time) + 1), -1);
+			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction), -1);
 	}
 
 	return hit;
@@ -208,7 +208,7 @@ vec3 render(vec2 fc) {
 			lightMultiplier = max(max(dot(normal, -lightDir), 0.f) + max(dot(refl, -lightDir), 0.f), lightMultiplier);
 
 		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= 0.75;
+		colorMultiplier *= 0.5;
 
 		ray = Ray(hit.position + refl * 5e-2, refl);
 		hit = march(ray);

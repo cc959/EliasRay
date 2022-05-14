@@ -93,7 +93,7 @@ int main()
 
     Shader def("res/vert.glsl", "res/frag.glsl");
 
-    Object objects[3] = {{vec4(1, 1, 1, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0, 0u}, {vec4(1, 10, 1, 0), vec4(4, 1, 4, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 0, 1), 0.5, 1u}};
+    Object objects[3] = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0.8, 0u}, {vec4(1, 10, 1, 0), vec4(4, 1, 4, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 0, 1), 0.75, 1u}};
 
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);

@@ -80,7 +80,7 @@ vec3 Player::updateVelocity(vec3 forward, vec3 right, vec3 up, float deltaTime)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
         offset += -up * playerSpeed;
 
-    velocity += (offset - velocity) * acceleration * 60.f * deltaTime;
+    velocity = offset;
 
     return velocity;
 }
