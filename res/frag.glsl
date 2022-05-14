@@ -33,7 +33,6 @@ struct Object {
 	vec4 size;
 	vec4 color;
 	float smoothness;
-	float metallic;
 	uint data;
 };
 
@@ -209,7 +208,7 @@ vec3 render(vec2 fc) {
 			lightMultiplier = max(max(dot(normal, -lightDir), 0.f) + max(dot(refl, -lightDir), 0.f), lightMultiplier);
 
 		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= objects[hit.object].metallic * 0.75;
+		colorMultiplier *= 0.75;
 
 		ray = Ray(hit.position + refl * 5e-2, refl);
 		hit = march(ray);

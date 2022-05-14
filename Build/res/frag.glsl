@@ -33,7 +33,6 @@ struct Object {
 	vec4 size;
 	vec4 color;
 	float smoothness;
-	float metallic;
 	uint data;
 };
 
@@ -163,7 +162,7 @@ Hit march(Ray ray) {
 		}
 
 		if(++cnt > maxsteps || d.dist > 1.f / eps)
-			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction), -1);
+			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction) * (sin(u_time) + 1), -1);
 	}
 
 	return hit;
@@ -204,12 +203,12 @@ vec3 render(vec2 fc) {
 
 		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 
-		float lightMultiplier = 0.4f;
+		float lightMultiplier = 0.2f;
 		if(light.object == -1)
-			lightMultiplier = max(max(dot(normal, -lightDir), 0.f) + max(dot(refl, -lightDir), 0.f), 0.1f);
+			lightMultiplier = max(max(dot(normal, -lightDir), 0.f) + max(dot(refl, -lightDir), 0.f), lightMultiplier);
 
 		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= objects[hit.object].metallic * 0.75;
+		colorMultiplier *= 0.75;
 
 		ray = Ray(hit.position + refl * 5e-2, refl);
 		hit = march(ray);
