@@ -1,10 +1,14 @@
-#include "shader.h"
+#include "Camera.h"
+#include "Player.h"
+#include "Shader.h"
+#include "Texture.h"
 #include <GL/glew.h>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <bits/stdc++.h>
 #include <glm/gtx/transform.hpp>
+#include <glm/matrix.hpp>
 
 using namespace std;
 // using namespace sf;
@@ -43,10 +47,20 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 }
 
+struct alignas(16) Object
+{
+    vec4 position;
+    vec4 size;
+    vec4 color;
+    float smoothness;
+    float metallic;
+    uint data;
+};
+
 int main()
 {
 
-    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Shader", sf::Style::Fullscreen, sf::ContextSettings{24, 8, 0, 4, 6});
+    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "EliasRay", sf::Style::Default, sf::ContextSettings{24, 8, 0, 4, 6});
     window.setVerticalSyncEnabled(true);
 
     window.setActive(true);
@@ -60,6 +74,14 @@ int main()
     glewInit();
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    Player player(&window);
+    Camera camera = Camera();
+
+    Texture skybox("res/SkyBox.jpg");
+    skybox.SetFilters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
     // This will identify our vertex buffer
     GLuint vertexbuffer;
@@ -72,9 +94,24 @@ int main()
 
     Shader def("res/vert.glsl", "res/frag.glsl");
 
+    Object objects[3] = {{vec4(1, 1, 1, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0, 1, 0u}, {vec4(1, 10, 1, 0), vec4(4, 1, 4, 0), vec4(1, 1, 1, 1), 1, 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 0, 1), 0.5, 0.1, 1u}};
+
+    vec3 lightDir(0.5, -1, 0.2);
+    lightDir = normalize(lightDir);
+
+    GLuint objectBuffer;
+    glGenBuffers(1, &objectBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, objectBuffer);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(Object) * 3, &objects[0], GL_STATIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, objectBuffer);
+
+    int frames = 0;
+    bool renderMode = 0;
+
     bool running = true;
     while (running)
     {
+        frames++;
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -88,23 +125,69 @@ int main()
                 // adjust the viewport when the window is resized
                 glViewport(0, 0, event.size.width, event.size.height);
                 window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
+                glClear(GL_COLOR_BUFFER_BIT);
+                camera.aspectRatio = event.size.width / event.size.height;
+            }
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::C)
+                {
+                    {
+                        glClear(GL_COLOR_BUFFER_BIT);
+                        renderMode = !renderMode;
+                    }
+                }
+                if (event.key.code == sf::Keyboard::S && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+                {
+                    int width = window.getSize().x;
+                    int height = window.getSize().y;
+
+                    vector<uint8> pixels(4 * width * height);
+                    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &pixels[0]);
+
+                    sf::Image output;
+                    output.create(width, height, &pixels[0]);
+                    output.flipVertically();
+                    output.saveToFile("image.jpg");
+                }
             }
         }
+
+        if (!renderMode)
+            frames = 1;
 
         float deltaTime = frameClock.getElapsedTime().asSeconds();
         frameClock.restart();
 
         float fps = 1.f / deltaTime;
 
-        // def.reload();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (!renderMode)
+            player.UpdateTransform(deltaTime);
 
-        glUseProgram(def);
+        camera = player.transform;
+
+        mat4 _CameraInverseProjection = inverse(camera.ProjectionMatrix());
+        mat4 _CameraToWorld = inverse(camera.ViewMatrix());
+
+        // def.reload();
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        def.BindShader();
 
         glUniform1f(glGetUniformLocation(def, "u_time"), elapsedClock.getElapsedTime().asSeconds());
         auto mousePos = sf::Mouse::getPosition(window);
         glUniform2f(glGetUniformLocation(def, "u_mouse"), mousePos.x, window.getSize().y - mousePos.y);
         glUniform2f(glGetUniformLocation(def, "u_resolution"), window.getSize().x, window.getSize().y);
+        glUniformMatrix4fv(glGetUniformLocation(def, "_CameraInverseProjection"), 1, false, &_CameraInverseProjection[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(def, "_CameraToWorld"), 1, false, &_CameraToWorld[0][0]);
+        glUniform1i(glGetUniformLocation(def, "n"), 3);
+        glUniform1i(glGetUniformLocation(def, "frames"), frames);
+        glUniform3f(glGetUniformLocation(def, "lightDir"), lightDir[0], lightDir[1], lightDir[2]);
+
+        glActiveTexture(GL_TEXTURE1);
+        skybox.BindTexture();
+        glUniform1i(glGetUniformLocation(def, "skybox"), 1);
+        glActiveTexture(GL_TEXTURE0);
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(0);
@@ -123,27 +206,31 @@ int main()
 
         window.pushGLStates();
 
-        sf::Text text;
+        if (!renderMode)
+        {
 
-        // select the font
-        text.setFont(fpsFont); // font is a sf::Font
+            sf::Text text;
 
-        // set the string to display
-        // text.setString("Fps: " + std::to_string(fps));
-        string name((char *)glGetString(GL_VENDOR));
+            // select the font
+            text.setFont(fpsFont); // font is a sf::Font
 
-        text.setString(name + " " + std::to_string(window.getSettings().antialiasingLevel) + "\nFps: " + std::to_string(fps));
-        // set the character size
-        text.setCharacterSize(24); // in pixels, not points!
+            // set the string to display
+            // text.setString("Fps: " + std::to_string(fps));
+            string name((char *)glGetString(GL_VENDOR));
 
-        // set the color
-        text.setFillColor(sf::Color::White);
+            text.setString(name + " " + std::to_string(window.getSettings().antialiasingLevel) + "\nFps: " + std::to_string(fps));
+            // set the character size
+            text.setCharacterSize(24); // in pixels, not points!
 
-        // set the text style
-        text.setStyle(sf::Text::Bold);
+            // set the color
+            text.setFillColor(sf::Color::Black);
 
-        // inside the main loop, between window.clear() and window.display()
-        window.draw(text);
+            // set the text style
+            text.setStyle(sf::Text::Bold);
+
+            // inside the main loop, between window.clear() and window.display()
+            window.draw(text);
+        }
 
         window.popGLStates();
 
