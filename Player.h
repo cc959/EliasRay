@@ -27,13 +27,13 @@ public:
 
     void updateMouseLock(bool mouseLocked);
 
+    float horizontalAngle;
+    float verticalAngle;
+
 private:
     float playerSpeed;
     float acceleration;
     float mouseSens;
-
-    float verticalAngle;
-    float horizontalAngle;
 
     mat4 projectionMatrix;
 

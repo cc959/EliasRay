@@ -48,13 +48,15 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 }
 
-struct alignas(16) Object
+struct Object
 {
     vec4 position;
     vec4 size;
     vec4 color;
     float smoothness;
     uint data;
+    int padA = 0;
+    int padB = 0;
 };
 
 int main()
@@ -78,7 +80,8 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Player player(&window);
-    player.transform = Transform(vec3(0, 20, -30), angleAxis(radians(45.f), vec3(1, 0, 0)));
+    player.transform.Position = vec3(0, 30, -30);
+    player.verticalAngle = radians(37.f);
     Camera camera = Camera();
 
     Texture skybox("res/SkyBox.jpg");
@@ -95,7 +98,10 @@ int main()
 
     Shader def("res/vert.glsl", "res/frag.glsl");
 
-    Object objects[2] = {/*{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0.8, 0u},*/ {vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(0.2, 0.2, 0.2, 1), 0, 2u}, {vec4(0, 0, 0, 0), vec4(100, 0.1, 100, 0), vec4(1, 0, 0, 1), 0.95, 1u}};
+    vector<Object> fractal = {{vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(0.2, 0.2, 0.2, 1), 1, 2u}, {vec4(0, 0, 0, 0), vec4(100, 0.1, 100, 0), vec4(1, 0, 0, 1), 0.95, 1u}};
+    vector<Object> balls = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 1, 0u}, {vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 1, 1), 0.2, 1u}};
+
+    vector<Object> scene = balls;
 
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);
@@ -103,13 +109,16 @@ int main()
     GLuint objectBuffer;
     glGenBuffers(1, &objectBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, objectBuffer);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(Object) * 2, &objects[0], GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(Object) * scene.size(), &scene[0], GL_STATIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, objectBuffer);
 
     int frames = 0;
     bool renderMode = 0;
 
     bool running = true;
+
+    sf::Vector2i lastPosition = window.getPosition();
+
     while (running)
     {
         frames++;
@@ -128,6 +137,7 @@ int main()
                 window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
                 glClear(GL_COLOR_BUFFER_BIT);
                 camera.aspectRatio = float(event.size.width) / float(event.size.height);
+                player.updateMouseLock(true);
             }
             else if (event.type == sf::Event::KeyPressed)
             {
@@ -151,6 +161,10 @@ int main()
                 }
             }
         }
+
+        if (window.getPosition() != lastPosition)
+            player.updateMouseLock(true);
+        lastPosition = window.getPosition();
 
         if (!renderMode)
             frames = 1;
@@ -179,7 +193,7 @@ int main()
         glUniform2f(glGetUniformLocation(def, "u_resolution"), window.getSize().x, window.getSize().y);
         glUniformMatrix4fv(glGetUniformLocation(def, "_CameraInverseProjection"), 1, false, &_CameraInverseProjection[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(def, "_CameraToWorld"), 1, false, &_CameraToWorld[0][0]);
-        glUniform1i(glGetUniformLocation(def, "n"), 2);
+        glUniform1i(glGetUniformLocation(def, "n"), scene.size());
         glUniform1i(glGetUniformLocation(def, "frames"), frames);
         glUniform3f(glGetUniformLocation(def, "lightDir"), lightDir[0], lightDir[1], lightDir[2]);
 

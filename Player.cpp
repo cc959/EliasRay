@@ -7,8 +7,6 @@ Player::Player(sf::Window *gameWindow, float playerSpeed, float acceleration, fl
     this->acceleration = acceleration;
     this->mouseSens = mouseSens;
 
-    verticalAngle = 0;
-    horizontalAngle = 0;
     velocity = vec3(0, 0, 0);
     updateMouseLock(true);
 }

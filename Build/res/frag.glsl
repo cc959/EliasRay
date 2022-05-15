@@ -94,8 +94,8 @@ float sdRect(vec3 pos, vec3 size, vec3 sp) {
 }
 
 int Iterations = 15;
-float Bailout = 1.5;
-float Power = 8;
+float Bailout = 2;
+float Power = 6;
 
 float deBulb(vec3 pos) {
 	vec3 z = pos;
@@ -194,7 +194,7 @@ Hit march(Ray ray) {
 		}
 
 		if(++cnt > maxsteps || d.dist > 1.f / eps)
-			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction), -1);
+			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction) * 1.5, -1);
 	}
 
 	return hit;
@@ -210,9 +210,9 @@ vec3 render(vec2 fc) {
 	Hit hit = march(ray);
 
 	vec3 outColor = vec3(0);
-	float colorMultiplier = 1;
+	vec3 colorMultiplier = vec3(1);
 
-	for(int i = 0; i < 5 && colorMultiplier > 0.1f; i++) {
+	for(int i = 0; i < 5; i++) {
 
 		if(hit.object == -1) {
 			outColor += hit.color.xyz * colorMultiplier;
@@ -231,19 +231,28 @@ vec3 render(vec2 fc) {
 
 		refl *= randomRot(scatter, normal + hit.position);
 
-		vec3 direction = lightDir * randomRot(0, refl);
+		vec3 direction = lightDir * randomRot(0.1, refl);
 
 		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 
-		float lightMultiplier = 0.1f;
+		ray = Ray(hit.position + refl * 5e-2, refl);
+		Hit newhit = march(ray);
+
+		float diffuse = 0.f;
+		float specular = 0.f;
+
 		if(light.object == -1)
-			lightMultiplier = max(max(dot(normal, -lightDir), 0.f) + max(dot(refl, -lightDir), 0.f), lightMultiplier);
+			diffuse = max(dot(normal, -lightDir), 0.f);
+
+		if(newhit.object == -1)
+			specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
+
+		float lightMultiplier = min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8) * 1.2, 1);
 
 		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= 0.5;
+		colorMultiplier *= 0.5 * (min(hit.color.xyz + 0.4, 1.f));
 
-		ray = Ray(hit.position + refl * 5e-2, refl);
-		hit = march(ray);
+		hit = newhit;
 	}
 
 	return outColor;
