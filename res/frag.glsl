@@ -231,7 +231,7 @@ vec3 render(vec2 fc) {
 
 		refl *= randomRot(scatter, normal + hit.position);
 
-		vec3 direction = lightDir * randomRot(0.05, refl);
+		vec3 direction = lightDir * randomRot(0.01, refl);
 
 		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 

@@ -94,7 +94,7 @@ float sdRect(vec3 pos, vec3 size, vec3 sp) {
 }
 
 int Iterations = 15;
-float Bailout = 2;
+float Bailout = 1.5;
 float Power = 8;
 
 float deBulb(vec3 pos) {
@@ -231,7 +231,7 @@ vec3 render(vec2 fc) {
 
 		refl *= randomRot(scatter, normal + hit.position);
 
-		vec3 direction = lightDir * randomRot(0.05, refl);
+		vec3 direction = lightDir * randomRot(0, refl);
 
 		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 

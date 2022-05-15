@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <bits/stdc++.h>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/matrix.hpp>
 
@@ -77,6 +78,7 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Player player(&window);
+    player.transform = Transform(vec3(0, 20, -30), angleAxis(radians(45.f), vec3(1, 0, 0)));
     Camera camera = Camera();
 
     Texture skybox("res/SkyBox.jpg");
@@ -93,7 +95,7 @@ int main()
 
     Shader def("res/vert.glsl", "res/frag.glsl");
 
-    Object objects[2] = {/*{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0.8, 0u},*/ {vec4(1, 10, 1, 0), vec4(10, 1, 4, 0), vec4(1, 1, 1, 1), 0.5, 2u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 0, 1), 1, 1u}};
+    Object objects[2] = {/*{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0.8, 0u},*/ {vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(0.2, 0.2, 0.2, 1), 0, 2u}, {vec4(0, 0, 0, 0), vec4(100, 0.1, 100, 0), vec4(1, 0, 0, 1), 0.95, 1u}};
 
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);
@@ -125,16 +127,14 @@ int main()
                 glViewport(0, 0, event.size.width, event.size.height);
                 window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height)));
                 glClear(GL_COLOR_BUFFER_BIT);
-                camera.aspectRatio = event.size.width / event.size.height;
+                camera.aspectRatio = float(event.size.width) / float(event.size.height);
             }
             else if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code == sf::Keyboard::C)
                 {
-                    {
-                        glClear(GL_COLOR_BUFFER_BIT);
-                        renderMode = !renderMode;
-                    }
+                    glClear(GL_COLOR_BUFFER_BIT);
+                    renderMode = !renderMode;
                 }
                 if (event.key.code == sf::Keyboard::S && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
                 {
@@ -163,7 +163,7 @@ int main()
         if (!renderMode)
             player.UpdateTransform(deltaTime);
 
-        camera = player.transform;
+        *((Transform *)&camera) = player.transform; // sketchy pointer stuff to set the base transform and not change the camera settings
 
         mat4 _CameraInverseProjection = inverse(camera.ProjectionMatrix());
         mat4 _CameraToWorld = inverse(camera.ViewMatrix());
