@@ -93,12 +93,44 @@ float sdRect(vec3 pos, vec3 size, vec3 sp) {
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
 
+int Iterations = 15;
+float Bailout = 2;
+float Power = 8;
+
+float deBulb(vec3 pos) {
+	vec3 z = pos;
+	float dr = 1.0;
+	float r = 0.0;
+	for(int i = 0; i < Iterations; i++) {
+		r = length(z);
+		if(r > Bailout)
+			break;
+
+		// convert to polar coordinates
+		float theta = acos(z.z / r);
+		float phi = atan(z.y, z.x);
+		dr = pow(r, Power - 1.0) * Power * dr + 1.0;
+
+		// scale and rotate the point
+		float zr = pow(r, Power);
+		theta = theta * Power;
+		phi = phi * Power;
+
+		// convert back to cartesian coordinates
+		z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
+		z += pos;
+	}
+	return 0.5 * log(r) * r / dr;
+}
+
 float sd(Object object, vec3 sp) {
 	uint type = object.data & ((1 << 30) - 1);
 	if(type == 0)
 		return sdSphere(object.position.xyz, object.size.x, sp);
 	if(type == 1)
 		return sdRect(object.position.xyz, object.size.xyz, sp);
+	if(type == 2)
+		return deBulb((sp - object.position.xyz) / object.size.x) * object.size.x;
 }
 
 vec4 sampleSkyBox(vec3 direction) {
@@ -203,7 +235,7 @@ vec3 render(vec2 fc) {
 
 		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 
-		float lightMultiplier = 0.2f;
+		float lightMultiplier = 0.1f;
 		if(light.object == -1)
 			lightMultiplier = max(max(dot(normal, -lightDir), 0.f) + max(dot(refl, -lightDir), 0.f), lightMultiplier);
 

@@ -88,12 +88,12 @@ int main()
     glGenBuffers(1, &vertexbuffer);
     // The following commands will talk about our 'vertexbuffer' buffer
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    // Give our vertices to OpenGL.
+    // Give our vertices to OpenGL.op
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
     Shader def("res/vert.glsl", "res/frag.glsl");
 
-    Object objects[3] = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0.8, 0u}, {vec4(1, 10, 1, 0), vec4(4, 1, 4, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 0, 1), 0.75, 1u}};
+    Object objects[2] = {/*{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 0.8, 0u},*/ {vec4(1, 10, 1, 0), vec4(10, 1, 4, 0), vec4(1, 1, 1, 1), 0.5, 2u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 0, 1), 1, 1u}};
 
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);
@@ -101,7 +101,7 @@ int main()
     GLuint objectBuffer;
     glGenBuffers(1, &objectBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, objectBuffer);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(Object) * 3, &objects[0], GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(Object) * 2, &objects[0], GL_STATIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, objectBuffer);
 
     int frames = 0;
@@ -179,7 +179,7 @@ int main()
         glUniform2f(glGetUniformLocation(def, "u_resolution"), window.getSize().x, window.getSize().y);
         glUniformMatrix4fv(glGetUniformLocation(def, "_CameraInverseProjection"), 1, false, &_CameraInverseProjection[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(def, "_CameraToWorld"), 1, false, &_CameraToWorld[0][0]);
-        glUniform1i(glGetUniformLocation(def, "n"), 3);
+        glUniform1i(glGetUniformLocation(def, "n"), 2);
         glUniform1i(glGetUniformLocation(def, "frames"), frames);
         glUniform3f(glGetUniformLocation(def, "lightDir"), lightDir[0], lightDir[1], lightDir[2]);
 
