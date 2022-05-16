@@ -194,7 +194,7 @@ Hit march(Ray ray) {
 		}
 
 		if(++cnt > maxsteps || d.dist > 1.f / eps)
-			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction) * 1.5, -1);
+			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction), -1);
 	}
 
 	return hit;
@@ -247,7 +247,7 @@ vec3 render(vec2 fc) {
 		if(newhit.object == -1)
 			specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
 
-		float lightMultiplier = min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8) * 1.2, 1);
+		float lightMultiplier = min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8), 1);
 
 		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
 		colorMultiplier *= 0.5 * (mix(hit.color.xyz, vec3(1.f), objects[hit.object].smoothness * 0.5));
@@ -264,6 +264,8 @@ void main() {
 	vec3 outColor = vec3(0);
 
 	outColor += render(fc + random2(fc * u_time));
+
+	outColor = pow(outColor, vec3(1.0 / 2.2));
 
 	fragColor = vec4(outColor, 1.f / float(frames));
 }

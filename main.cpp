@@ -99,9 +99,9 @@ int main()
     Shader def("res/vert.glsl", "res/frag.glsl");
 
     vector<Object> fractal = {{vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(0.6, 0.6, 0.6, 1), 0.4, 2u}, {vec4(0, 0, 0, 0), vec4(100, 0.1, 100, 0), vec4(1, 0, 0, 1), 0.9, 1u}};
-    vector<Object> balls = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 1, 0u}, {vec4(0, 5, 0.5, 0), vec4(6, 5, 0.1, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 1, 1), 0.9, 1u}, {vec4(6, 5, 0.5, 0), vec4(0.2, 5, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}, {vec4(-6, 5, 0.5, 0), vec4(0.2, 5, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}, {vec4(0, 10, 0.5, 0), vec4(6, 0.2, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}};
+    vector<Object> balls = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 1, 0u}, {vec4(0, 5, 0.5, 0), vec4(6, 5, 0.1, 0), vec4(1, 1, 1, 1), 0.995, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 1, 1), 0.9, 1u}, {vec4(6, 5, 0.5, 0), vec4(0.2, 5, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}, {vec4(-6, 5, 0.5, 0), vec4(0.2, 5, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}, {vec4(0, 10, 0.5, 0), vec4(6, 0.2, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}};
 
-    vector<Object> scene = fractal;
+    vector<Object> scene = balls;
 
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);
@@ -113,22 +113,44 @@ int main()
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, objectBuffer);
 
     int frames = 0;
-    bool renderMode = 0;
+    bool renderMode = true;
 
     bool running = true;
 
     sf::Vector2i lastPosition = window.getPosition();
 
+    int rendered = 0;
+	int num = 10;
+
     while (running)
     {
         frames++;
+        rendered++;
+
+        float t = (rendered / 10) / float(10);
+
+        player.transform.Position = vec3(20 * sin(t), 20 + sin(t) * 5, 20 * cos(t));
+        player.transform.Rotation = quatLookAt(normalize(player.transform.Position), vec3(0, 1, 0));
+
         sf::Event event;
+
+        if (rendered != 0 && rendered % 10 == 0)
+            goto save;
+
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
             {
                 // end the program
                 running = false;
+            }
+            if (event.type == sf::Event::LostFocus)
+            {
+                player.updateMouseLock(false);
+            }
+            if (event.type == sf::Event::GainedFocus)
+            {
+                player.updateMouseLock(true);
             }
             else if (event.type == sf::Event::Resized)
             {
@@ -148,6 +170,7 @@ int main()
                 }
                 if (event.key.code == sf::Keyboard::S && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
                 {
+                save:
                     int width = window.getSize().x;
                     int height = window.getSize().y;
 
@@ -157,7 +180,12 @@ int main()
                     sf::Image output;
                     output.create(width, height, &pixels[0]);
                     output.flipVertically();
-                    output.saveToFile("image.jpg");
+                    output.saveToFile("image" + to_string(rendered / 10) + ".jpg");
+                    frames = 1;
+                }
+                if (event.key.code == sf::Keyboard::R)
+                {
+                    def = Shader("res/vert.glsl", "res/frag.glsl");
                 }
             }
         }
@@ -174,8 +202,8 @@ int main()
 
         float fps = 1.f / deltaTime;
 
-        if (!renderMode)
-            player.UpdateTransform(deltaTime);
+        // if (!renderMode)
+        //     player.UpdateTransform(deltaTime);
 
         *((Transform *)&camera) = player.transform; // sketchy pointer stuff to set the base transform and not change the camera settings
 
