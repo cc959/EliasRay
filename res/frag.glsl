@@ -231,7 +231,7 @@ vec3 render(vec2 fc) {
 
 		refl *= randomRot(scatter, normal + hit.position);
 
-		vec3 direction = lightDir * randomRot(0.1, refl);
+		vec3 direction = lightDir * randomRot(0.03, refl);
 
 		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 
@@ -250,7 +250,7 @@ vec3 render(vec2 fc) {
 		float lightMultiplier = min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8) * 1.2, 1);
 
 		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= 0.5 * (min(hit.color.xyz + 0.4, 1.f));
+		colorMultiplier *= 0.5 * (mix(hit.color.xyz, vec3(1.f), objects[hit.object].smoothness * 0.5));
 
 		hit = newhit;
 	}

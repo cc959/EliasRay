@@ -98,10 +98,10 @@ int main()
 
     Shader def("res/vert.glsl", "res/frag.glsl");
 
-    vector<Object> fractal = {{vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(0.2, 0.2, 0.2, 1), 1, 2u}, {vec4(0, 0, 0, 0), vec4(100, 0.1, 100, 0), vec4(1, 0, 0, 1), 0.95, 1u}};
-    vector<Object> balls = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 1, 0u}, {vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 1, 1), 0.2, 1u}};
+    vector<Object> fractal = {{vec4(0, 10, 0, 0), vec4(10, 1, 4, 0), vec4(0.6, 0.6, 0.6, 1), 0.4, 2u}, {vec4(0, 0, 0, 0), vec4(100, 0.1, 100, 0), vec4(1, 0, 0, 1), 0.9, 1u}};
+    vector<Object> balls = {{vec4(0, 1, 0, 0), vec4(1, 0, 0, 0), vec4(1, 0, 0, 1), 1, 0u}, {vec4(0, 5, 0.5, 0), vec4(6, 5, 0.1, 0), vec4(1, 1, 1, 1), 1, 1u}, {vec4(0, 0, 0, 0), vec4(20, 0.1, 20, 0), vec4(0, 0.5, 1, 1), 0.9, 1u}, {vec4(6, 5, 0.5, 0), vec4(0.2, 5, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}, {vec4(-6, 5, 0.5, 0), vec4(0.2, 5, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}, {vec4(0, 10, 0.5, 0), vec4(6, 0.2, 0.2, 0), vec4(0, 0, 0, 1), 0.9, 1u}};
 
-    vector<Object> scene = balls;
+    vector<Object> scene = fractal;
 
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);
