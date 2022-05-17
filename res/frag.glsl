@@ -85,7 +85,7 @@ mat3 randomRot(float scatter, vec3 seed) {
 float sdSphere(vec3 pos, float r, vec3 sp) {
 	vec3 d = pos - sp;
 	//if(max(abs(d.x), abs(d.z)) < 17.5)
-		d.xz = mod(d.xz + 2.5, 5) - 2.5;
+	//	d.xz = mod(d.xz + 2.5, 5) - 2.5;
 	return length(d) - r;
 }
 
@@ -131,7 +131,7 @@ float sd(Object object, vec3 sp) {
 	if(type == 1)
 		return sdRect(object.position.xyz, object.size.xyz, sp);
 	if(type == 2)
-		return deBulb((sp - object.position.xyz) / object.size.x) * object.size.x;
+		return deBulb(((sp - object.position.xyz) / object.size.x)) * object.size.x;
 }
 
 vec4 sampleSkyBox(vec3 direction) {
@@ -177,8 +177,8 @@ Ray CreateCameraRay(vec2 uv) {
 	return Ray(origin, direction);
 }
 
-float eps = 1e-3;
-int maxsteps = 200;
+float eps = 5e-2;
+int maxsteps = 100;
 
 Hit march(Ray ray) {
 	int cnt = 0;
@@ -234,23 +234,23 @@ vec3 render(vec2 fc) {
 
 		vec3 direction = lightDir * randomRot(0.03, refl);
 
-		Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
+		//Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 
-		ray = Ray(hit.position + refl * 5e-2, refl);
+		ray = Ray(hit.position + refl * ep * 5, refl);
 		Hit newhit = march(ray);
 
-		float diffuse = 0.f;
-		float specular = 0.f;
+		//float diffuse = 0.f;
+		//float specular = 0.f;
 
-		if(light.object == -1)
-			diffuse = max(dot(normal, -lightDir), 0.f);
+		//if(light.object == -1)
+		//	diffuse = max(dot(normal, -lightDir), 0.f);
 
-		if(newhit.object == -1)
-			specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
+		//if(newhit.object == -1)
+		//	specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
 
-		float lightMultiplier = min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8), 1);
+		//float lightMultiplier = 0;//min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8), 1);
 
-		outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
+		//outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
 		colorMultiplier *= 0.5 * (mix(hit.color.xyz, vec3(1.f), objects[hit.object].smoothness * 0.5));
 
 		hit = newhit;
