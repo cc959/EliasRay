@@ -178,7 +178,7 @@ Ray CreateCameraRay(vec2 uv) {
 }
 
 float eps = 1e-2;
-int maxsteps = 75;
+int maxsteps = 100;
 
 Hit march(Ray ray) {
 	int cnt = 0;
