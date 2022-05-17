@@ -127,7 +127,7 @@ float deBulb(vec3 pos) {
 float sd(Object object, vec3 sp) {
 	uint type = object.data & ((1 << 30) - 1);
 	if(type == 0)
-		return sdSphere(object.position.xyz, object.size.x, sp);
+		return sdSphere(object.position.xyz, object.size.y, sp);
 	if(type == 1)
 		return sdRect(object.position.xyz, object.size.xyz, sp);
 	if(type == 2)
@@ -138,7 +138,7 @@ vec4 sampleSkyBox(vec3 direction) {
 	// Sample the skybox and write it
 	float theta = acos(direction.y) / -PI;
 	float phi = atan(-direction.z, direction.x) / -PI * 0.5f;
-	return texture(skybox, vec2(phi, theta));
+	return vec4(texture(skybox, vec2(phi, theta)).xyz, 0);
 }
 
 Hit query(vec3 sp) {
@@ -177,7 +177,7 @@ Ray CreateCameraRay(vec2 uv) {
 	return Ray(origin, direction);
 }
 
-float eps = 5e-2;
+float eps = 1e-2;
 int maxsteps = 100;
 
 Hit march(Ray ray) {
@@ -213,9 +213,9 @@ vec3 render(vec2 fc) {
 	vec3 outColor = vec3(0);
 	vec3 colorMultiplier = vec3(1);
 
-	for(int i = 0; i < 5; i++) {
+	for(int i = 0; i < 3; i++) {
 
-		if(hit.object == -1) {
+		if(hit.object == -1 || hit.color.w > 0.5) {
 			outColor += hit.color.xyz * colorMultiplier;
 			break;
 		}
@@ -232,11 +232,11 @@ vec3 render(vec2 fc) {
 
 		refl *= randomRot(scatter, normal + hit.position);
 
-		vec3 direction = lightDir * randomRot(0.03, refl);
+		//vec3 direction = lightDir * randomRot(0.03, refl);
 
 		//Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
 
-		ray = Ray(hit.position + refl * ep * 5, refl);
+		ray = Ray(hit.position + refl * eps * 10, refl);
 		Hit newhit = march(ray);
 
 		//float diffuse = 0.f;
@@ -265,6 +265,18 @@ void main() {
 	vec3 outColor = vec3(0);
 
 	outColor += render(fc + random2(fc * u_time));
+
+	for(int i = 0; i < 3; i++) {
+		float r = random(fc * float(i + 453) * (u_time + 5.f)) * 2.f * PI;
+		vec2 f = fc + vec2(sin(r), cos(r)) * random(fc * r) * 4;
+
+		vec2 uv = f / u_resolution * 2.f - 1.f;
+
+		Hit bloom = march(CreateCameraRay(uv));
+
+		if(bloom.color.w > 0.5)
+			outColor += bloom.color.xyz + vec3(0.4);
+	}
 
 	outColor = pow(outColor, vec3(1.0 / 2.2));
 
