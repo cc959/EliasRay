@@ -6,9 +6,8 @@ out vec4 fragColor;
 const float AA = 2;
 
 uniform vec2 u_resolution;
-uniform vec2 u_mouse;
 uniform float u_time;
-uniform int frames;
+uniform int smple;
 uniform vec3 lightDir;
 
 uniform int n;
@@ -34,6 +33,8 @@ struct Object {
 	vec4 color;
 	float smoothness;
 	uint data;
+	int padA;
+	int padB;
 };
 
 struct Hit {
@@ -83,7 +84,7 @@ mat3 randomRot(float scatter, vec3 seed) {
 
 float sdSphere(vec3 pos, float r, vec3 sp) {
 	vec3 d = pos - sp;
-	if(max(abs(d.x), abs(d.z)) < 17.5)
+	//if(max(abs(d.x), abs(d.z)) < 17.5)
 		d.xz = mod(d.xz + 2.5, 5) - 2.5;
 	return length(d) - r;
 }
@@ -267,5 +268,5 @@ void main() {
 
 	outColor = pow(outColor, vec3(1.0 / 2.2));
 
-	fragColor = vec4(outColor, 1.f / float(frames));
+	fragColor = vec4(outColor, 1.f / float(smple));
 }

@@ -1,9 +1,9 @@
-args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20
+args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3
 
 CXX = gcc # Flag for implicit rules
 CXXFLAGS = -g -I ./ $(args) -std=c++20 # Flag for implicit rules. Turn on debug info
 
-objects = main.o Camera.o ComputeShader.o GlStorage.o Light.o Mesh.o Player.o Shader.o Texture.o Transform.o
+objects = main.o Camera.o ComputeShader.o GlStorage.o Light.o Mesh.o Shader.o Texture.o Transform.o Renderer.o Object.o
 
 build: copy $(objects)
 	g++ $(objects) $(args) -o ./Build/main
