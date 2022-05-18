@@ -1,0 +1,17 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/elias/Documents/EliasRay'
+rsync --archive --delete ./res ./Build
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o main.o main.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Camera.o Camera.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o ComputeShader.o ComputeShader.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o GlStorage.o GlStorage.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Light.o Light.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Mesh.o Mesh.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Shader.o Shader.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Texture.o Texture.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Transform.o Transform.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Renderer.o Renderer.cpp
+gcc  -g -I ./ -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -std=c++20    -c -o Object.o Object.cpp
+g++ main.o Camera.o ComputeShader.o GlStorage.o Light.o Mesh.o Shader.o Texture.o Transform.o Renderer.o Object.o -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3 -o ./Build/main
+make: Leaving directory '/home/elias/Documents/EliasRay'
+ 
