@@ -64,7 +64,7 @@ int main()
     // system("rm ./Render/*.jpg");
 
     Renderer r(1280, 720, setup);
-    r.Render(0, 300, 30);
+    r.Render(299, 300, 30);
 
     system("ffmpeg -y -framerate 30 -i ./Render/image%1d.jpg ./output.mp4");
 }

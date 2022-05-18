@@ -266,9 +266,9 @@ void main() {
 
 	outColor += render(fc + random2(fc * u_time));
 
-	for(int i = 0; i < 3; i++) {
-		float r = random(fc * float(i + 453) * (u_time + 5.f)) * 2.f * PI;
-		vec2 f = fc + vec2(sin(r), cos(r)) * random(fc * r) * 4;
+	for(int i = 1; i <= 3; i++) {
+		float r = random(fc * float(i) * (u_time + 5.f)) * 2.f * PI;
+		vec2 f = fc + vec2(sin(r), cos(r)) * random(vec2(0, 1) * r) * 6;
 
 		vec2 uv = f / u_resolution * 2.f - 1.f;
 
