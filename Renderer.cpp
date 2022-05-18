@@ -117,16 +117,34 @@ void Renderer::Render(int startFrame, int endFrame, int samples)
             (void *)0 // array buffer offset
         );
 
+        auto printProgress = [&](int sample)
+        {
+            cout << "\rFrame " << frame << " ";
+            for (int i = 0; i < samples; i++)
+            {
+                if (i < sample)
+                    cout << "#";
+                else
+                    cout << ".";
+            }
+            cout << " " << sample << " / " << samples;
+            cout.flush();
+        };
+
+        printProgress(0);
+
         for (int sample = 0; sample < samples; sample++)
         {
 
             glUniform1f(glGetUniformLocation(def, "u_time"), frame * samples + sample);
             glUniform1i(glGetUniformLocation(def, "smple"), sample + 1);
 
-           // glClear(GL_DEPTH_BUFFER_BIT);
+            // glClear(GL_DEPTH_BUFFER_BIT);
             // Draw the triangle !
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glFinish();
+
+            printProgress(sample + 1);
         }
 
         glDisableVertexAttribArray(0);
@@ -134,6 +152,8 @@ void Renderer::Render(int startFrame, int endFrame, int samples)
         sf::Image out = output.getTexture().copyToImage();
         out.flipVertically();
         out.saveToFile("Render/image" + to_string(frame) + ".jpg");
+
+        cout << "\n";
     }
 
     glDeleteBuffers(1, &vertexbuffer);
