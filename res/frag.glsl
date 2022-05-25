@@ -148,7 +148,7 @@ Hit query(vec3 sp) {
 		if((objects[i].data & (1u << 30)) != 0)
 			dist *= -1;
 
-		Hit new = Hit(sp, dist, objects[i].color, i);
+		Hit new = Hit(sp, dist, objects[i].color, i);	
 
 		if(i == 0)
 			o = new;
