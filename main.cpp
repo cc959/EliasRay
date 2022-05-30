@@ -19,7 +19,7 @@ void setup(Camera &camera, vector<Object> &objects, int frame)
 
     float time = frame / float(30);
 
-    camera.Position = vec3(sin(time * 0.5f) * 30, 12.5 + sin(time * 0.5f) * 2.5, cos(time * 0.5f) * 30);
+    camera.Position = vec3(sin(time * 0.5f) * 30, 12.5 + sin(time * 1.f) * 2.5, cos(time * 0.5f) * 30);
 
     float height = 12.5;
 
@@ -46,14 +46,22 @@ void setup(Camera &camera, vector<Object> &objects, int frame)
         }
 
     Object plane;
-    plane.data = 1u;
-    // plane.setType(1);)
+    plane.data = 2u;
     plane.position = vec4(0, 0, 0, 0);
-    plane.size = vec4(50, 0.01, 50, 0);
+    plane.size = vec4(0, 1, 0, 0); // normal
     plane.color = vec4(0, 0, 0, 0);
     plane.smoothness = 0.95 + sin(time * 2) * 0.05;
 
     objects.push_back(plane);
+
+    // Object cube;
+    // cube.data = 1u;
+    // cube.position = vec4(0, 0, 0, 0);
+    // cube.size = vec4(6, 6, 6, 0);
+    // cube.color = vec4(1, 0, 0, 0);
+    // cube.smoothness = 0.5;
+
+    // objects.push_back(cube);
 }
 
 int main()
@@ -61,10 +69,10 @@ int main()
 
     system("mkdir ./Render");
 
-    // system("rm ./Render/*.jpg");
+    system("rm ./Render/*.jpg");
 
-    Renderer r(1280, 720, setup);
-    r.Render(300, 301, 1);
+    Renderer r(7680, 4320, setup);
+    r.Render(0, 10, 8);
 
     system("ffmpeg -y -framerate 30 -i ./Render/image%1d.jpg ./output.mp4");
 }

@@ -38,7 +38,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
 
 Renderer::Renderer(int width, int height, function<void(Camera &, vector<Object> &, int)> scene) : width(width), height(height), scene(scene)
 {
-    output.create(width, height, sf::ContextSettings{4, 4, 0, 4, 6});
+    output.create(width, height, sf::ContextSettings{0, 0, 0, 4, 2});
 
     if (!fpsFont.loadFromFile("res/Fonts/Roboto-Medium.ttf"))
         cout << "Error loading font\n";
@@ -61,7 +61,7 @@ void Renderer::Render(int startFrame, int endFrame, int samples)
     lightDir = normalize(lightDir);
 
     Texture skybox("res/Shang.png");
-    skybox.SetFilters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    skybox.SetFilters(GL_LINEAR, GL_LINEAR);
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);

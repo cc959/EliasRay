@@ -1,4 +1,4 @@
-#version 450 core
+#version 420 core
 
 out vec4 fragColor;
 #define PI 3.14159265359
@@ -32,16 +32,14 @@ struct Object {
 	vec4 size;
 	vec4 color;
 	float smoothness;
-	uint data;
-	int padA;
-	int padB;
+	int type;
 };
 
 struct Hit {
 	vec3 position;
 	float dist;
-	vec4 color;
-	int object;
+	vec3 normal;
+	Object object;
 };
 
 layout(std140, binding = 0) uniform object_buffer {
@@ -82,87 +80,90 @@ mat3 randomRot(float scatter, vec3 seed) {
 	return rotationX((random(seed.xy) - 0.5f) * scatter) * rotationY((random(seed.yz) - 0.5f) * scatter) * rotationZ((random(seed.zx) - 0.5f) * scatter);
 }
 
-float sdSphere(vec3 pos, float r, vec3 sp) {
-	vec3 d = pos - sp;
-	//if(max(abs(d.x), abs(d.z)) < 17.5)
-	//	d.xz = mod(d.xz + 2.5, 5) - 2.5;
-	return length(d) - r;
-}
-
-float sdRect(vec3 pos, vec3 size, vec3 sp) {
-	vec3 q = abs(pos - sp) - size;
-	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-}
-
-int Iterations = 15;
-float Bailout = 2;
-float Power = 6;
-
-float deBulb(vec3 pos) {
-	vec3 z = pos;
-	float dr = 1.0;
-	float r = 0.0;
-	for(int i = 0; i < Iterations; i++) {
-		r = length(z);
-		if(r > Bailout)
-			break;
-
-		// convert to polar coordinates
-		float theta = acos(z.z / r);
-		float phi = atan(z.y, z.x);
-		dr = pow(r, Power - 1.0) * Power * dr + 1.0;
-
-		// scale and rotate the point
-		float zr = pow(r, Power);
-		theta = theta * Power;
-		phi = phi * Power;
-
-		// convert back to cartesian coordinates
-		z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
-		z += pos;
-	}
-	return 0.5 * log(r) * r / dr;
-}
-
-float sd(Object object, vec3 sp) {
-	uint type = object.data & ((1 << 30) - 1);
-	if(type == 0)
-		return sdSphere(object.position.xyz, object.size.y, sp);
-	if(type == 1)
-		return sdRect(object.position.xyz, object.size.xyz, sp);
-	if(type == 2)
-		return deBulb(((sp - object.position.xyz) / object.size.x)) * object.size.x;
-}
-
 vec4 sampleSkyBox(vec3 direction) {
 	// Sample the skybox and write it
 	float theta = acos(direction.y) / -PI;
-	float phi = atan(-direction.z, direction.x) / -PI * 0.5f;
+	float phi = atan(direction.x, -direction.z) / -PI * 0.5f;
+
 	return vec4(texture(skybox, vec2(phi, theta)).xyz, 0);
 }
 
-Hit query(vec3 sp) {
-	Hit o;
-	for(int i = 0; i < n; i++) {
-		float dist = sd(objects[i], sp);
-		if((objects[i].data & (1u << 30)) != 0)
-			dist *= -1;
+bool intersectSphere(vec3 c, float r, Ray ray, inout Hit bestHit) {
+	vec3 d = ray.origin - c;
+	float p1 = -dot(ray.direction, d);
+	float p2sq = p1 * p1 - (dot(d, d) - r * r);
 
-		Hit new = Hit(sp, dist, objects[i].color, i);	
+	if(p2sq < 0)
+		return false;
 
-		if(i == 0)
-			o = new;
-		else {
-			if((objects[i].data & (1u << 31)) != 0) {
-				if(new.dist > o.dist)
-					o = new;
-			} else {
-				if(new.dist < o.dist)
-					o = new;
-			}
-		}
+	float p2 = sqrt(p2sq);
+	float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2; // use entry point unless behind you
+	if(t > 0 && t < bestHit.dist) {
+		bestHit.dist = t;
+		bestHit.position = ray.origin + t * ray.direction;
+		bestHit.normal = normalize(bestHit.position - c);
+		return true;
 	}
-	return o;
+	return false;
+}
+
+bool intersectPlane(vec3 c, vec3 normal, Ray ray, inout Hit bestHit) {
+	float den = dot(ray.direction, normal);
+
+	float d = dot((c - ray.origin), normal) / den;
+
+	if(den == 0 || d < 0)
+		return false;
+
+	vec3 position = ray.origin + ray.direction * d;
+
+	if(d < bestHit.dist && length(position.xz) < 40.f) {
+		bestHit.dist = d;
+		bestHit.position = position;
+		bestHit.normal = normal;
+		return true;
+	}
+	return false;
+}
+
+bool intersectBox(vec3 c, vec3 size, Ray ray, inout Hit bestHit) {
+	vec3 d = (ray.origin - c);
+	float winding = all(lessThanEqual(abs(d), size)) ? -1.0 : 1.0;	// Winding direction: -1 if the ray starts inside of the box (i.e., and is leaving), +1 if it is starting outside of the box
+
+	vec3 sgn = -sign(ray.direction); // planes the ray can intersect
+
+	vec3 distToPlane = (size * winding * sgn - d) / ray.direction;
+
+	#define TEST(U, VW)\
+	(distToPlane.U >= 0.0) && all(lessThan(abs(d.VW + ray.direction.VW * distToPlane.U), size.VW)) /**/
+
+	//sgn = sgn * vec3(TEST(x, yz), TEST(y, zx), TEST(z, xy));
+
+	sgn = TEST(x, yz) ? vec3(sgn.x, 0.0, 0.0) : (TEST(y, zx) ? vec3(0.0, sgn.y, 0.0) : vec3(0.0, 0.0, TEST(z, xy) ? sgn.z : 0));
+
+	if((sgn.x == 0) && (sgn.y == 0) && (sgn.z == 0))
+		return false;
+
+	float distance = (sgn.x != 0.0) ? distToPlane.x : ((sgn.y != 0.0) ? distToPlane.y : distToPlane.z);//dot(abs(sgn), distToPlane);
+
+	if(distance < bestHit.dist) {
+		bestHit.dist = distance;
+		bestHit.position = ray.origin + ray.direction * distance;
+		bestHit.normal = sgn;
+		return true;
+	}
+
+	return false;
+}
+
+bool intersectObject(Object object, Ray ray, inout Hit bestHit) {
+	if(object.type == 0)
+		return intersectSphere(object.position.xyz, object.size.x, ray, bestHit);
+	if(object.type == 1)
+		return intersectBox(object.position.xyz, object.size.xyz, ray, bestHit);
+	if(object.type == 2)
+		return intersectPlane(object.position.xyz, object.size.xyz, ray, bestHit);
+
 }
 
 Ray CreateCameraRay(vec2 uv) {
@@ -177,30 +178,20 @@ Ray CreateCameraRay(vec2 uv) {
 	return Ray(origin, direction);
 }
 
-float eps = 1e-2;
-int maxsteps = 100;
+Hit Trace(Ray ray) {
+	Hit bestHit;
+	bestHit.dist = 1e10;
+	bestHit.object = Object(vec4(0), vec4(0), sampleSkyBox(ray.direction), 0, -1); // skybox
+	bestHit.normal = vec3(1, 0, 0);
 
-Hit march(Ray ray) {
-	int cnt = 0;
+	for(int i = 0; i < n; i++) /**/
+		if(intersectObject(objects[i], ray, bestHit))
+			bestHit.object = objects[i];
 
-	Hit hit;
-
-	while(true) {
-		Hit d = query(ray.origin);
-		ray.origin += ray.direction * d.dist;
-
-		if(d.dist < eps) {
-			hit = d;
-			break;
-		}
-
-		if(++cnt > maxsteps || d.dist > 1.f / eps)
-			return Hit(ray.origin, d.dist, sampleSkyBox(ray.direction), -1);
-	}
-
-	return hit;
-
+	return bestHit;
 }
+
+const float eps = 1e-4;
 
 vec3 render(vec2 fc) {
 
@@ -208,50 +199,43 @@ vec3 render(vec2 fc) {
 
 	Ray ray = CreateCameraRay(uv);
 
-	Hit hit = march(ray);
+	Hit hit = Trace(ray);
 
 	vec3 outColor = vec3(0);
 	vec3 colorMultiplier = vec3(1);
 
-	for(int i = 0; i < 3; i++) {
+	for(int i = 0; i < 10; i++) {
 
-		if(hit.object == -1 || hit.color.w > 0.5) {
-			outColor += hit.color.xyz * colorMultiplier;
+		if(hit.object.type == -1 || hit.object.color.w > 0.5) {
+			outColor += hit.object.color.xyz * colorMultiplier;
 			break;
 		}
 
-		float center = hit.dist;
-		float x = query(hit.position + vec3(eps, 0, 0)).dist;
-		float y = query(hit.position + vec3(0, eps, 0)).dist;
-		float z = query(hit.position + vec3(0, 0, eps)).dist;
+		vec3 refl = reflect(ray.direction, hit.normal);
 
-		vec3 normal = (vec3(x, y, z) - center) / eps;
-		vec3 refl = reflect(ray.direction, normal);
-
-		float scatter = PI * (1.f - objects[hit.object].smoothness);
-
-		refl *= randomRot(scatter, normal + hit.position);
+		float scatter = PI * (1.f - hit.object.smoothness);
+		refl *= randomRot(scatter, hit.position);
 
 		//vec3 direction = lightDir * randomRot(0.03, refl);
 
-		//Hit light = march(Ray(hit.position - direction * 5e-2, -direction));
+		//Hit light = Trace(Ray(hit.position - direction * 5e-2, -direction));
 
-		ray = Ray(hit.position + refl * eps * 10, refl);
-		Hit newhit = march(ray);
+		ray = Ray(hit.position + refl * eps, refl);
+		Hit newhit = Trace(ray);
 
-		//float diffuse = 0.f;
-		//float specular = 0.f;
+		// float diffuse = 0.f;
+		// float specular = 0.f;
 
-		//if(light.object == -1)
-		//	diffuse = max(dot(normal, -lightDir), 0.f);
+		// if(light.object == -1)
+		// 	diffuse = max(dot(normal, -lightDir), 0.f);
 
-		//if(newhit.object == -1)
-		//	specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
+		// if(newhit.object == -1)
+		// 	specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
 
-		//float lightMultiplier = 0;//min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8), 1);
+		float lightMultiplier = 0;//min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8), 1);
 
-		//outColor += hit.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= 0.5 * (mix(hit.color.xyz, vec3(1.f), objects[hit.object].smoothness * 0.5));
+		outColor += hit.object.color.xyz * colorMultiplier * lightMultiplier;
+		colorMultiplier *= 0.5 * (mix(hit.object.color.xyz, vec3(1.f), hit.object.smoothness * 0.5));
 
 		hit = newhit;
 	}
@@ -265,18 +249,6 @@ void main() {
 	vec3 outColor = vec3(0);
 
 	outColor += render(fc + random2(fc * u_time));
-
-	for(int i = 1; i <= 3; i++) {
-		float r = random(fc * float(i) * (u_time + 5.f)) * 2.f * PI;
-		vec2 f = fc + vec2(sin(r), cos(r)) * random(vec2(0, 1) * r) * 6;
-
-		vec2 uv = f / u_resolution * 2.f - 1.f;
-
-		Hit bloom = march(CreateCameraRay(uv));
-
-		if(bloom.color.w > 0.5)
-			outColor += bloom.color.xyz + vec3(0.4);
-	}
 
 	outColor = pow(outColor, vec3(1.0 / 2.2));
 
