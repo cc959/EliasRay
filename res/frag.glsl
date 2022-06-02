@@ -1,5 +1,405 @@
 #version 420 core
 
+// Hash Functions https://www.shadertoy.com/view/ttc3zr
+
+uint murmurHash1(uint src) {
+	const uint M = 0x5bd1e995u;
+	uint h = 1190494759u;
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 1 output, 1 input
+float random(float src) {
+	uint h = murmurHash1(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uint murmurHash1(uvec2 src) {
+	const uint M = 0x5bd1e995u;
+	uint h = 1190494759u;
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 1 output, 2 inputs
+float random(vec2 src) {
+	uint h = murmurHash1(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uint murmurHash1(uvec3 src) {
+	const uint M = 0x5bd1e995u;
+	uint h = 1190494759u;
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 1 output, 3 inputs
+float random(vec3 src) {
+	uint h = murmurHash1(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uint murmurHash1(uvec4 src) {
+	const uint M = 0x5bd1e995u;
+	uint h = 1190494759u;
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h *= M;
+	h ^= src.w;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 1 output, 4 inputs
+float random(vec4 src) {
+	uint h = murmurHash1(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec2 murmurHash2(uint src) {
+	const uint M = 0x5bd1e995u;
+	uvec2 h = uvec2(1190494759u, 2147483647u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 2 outputs, 1 input
+vec2 random2(float src) {
+	uvec2 h = murmurHash2(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec2 murmurHash2(uvec2 src) {
+	const uint M = 0x5bd1e995u;
+	uvec2 h = uvec2(1190494759u, 2147483647u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 2 outputs, 2 inputs
+vec2 random2(vec2 src) {
+	uvec2 h = murmurHash2(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec2 murmurHash2(uvec3 src) {
+	const uint M = 0x5bd1e995u;
+	uvec2 h = uvec2(1190494759u, 2147483647u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 2 outputs, 3 inputs
+vec2 random2(vec3 src) {
+	uvec2 h = murmurHash2(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec2 murmurHash2(uvec4 src) {
+	const uint M = 0x5bd1e995u;
+	uvec2 h = uvec2(1190494759u, 2147483647u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h *= M;
+	h ^= src.w;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 2 outputs, 4 inputs
+vec2 random2(vec4 src) {
+	uvec2 h = murmurHash2(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec3 murmurHash3(uint src) {
+	const uint M = 0x5bd1e995u;
+	uvec3 h = uvec3(1190494759u, 2147483647u, 3559788179u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 3 outputs, 1 input
+vec3 random3(float src) {
+	uvec3 h = murmurHash3(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec3 murmurHash3(uvec2 src) {
+	const uint M = 0x5bd1e995u;
+	uvec3 h = uvec3(1190494759u, 2147483647u, 3559788179u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 3 outputs, 2 inputs
+vec3 random3(vec2 src) {
+	uvec3 h = murmurHash3(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec3 murmurHash3(uvec3 src) {
+	const uint M = 0x5bd1e995u;
+	uvec3 h = uvec3(1190494759u, 2147483647u, 3559788179u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 3 outputs, 3 inputs
+vec3 random3(vec3 src) {
+	uvec3 h = murmurHash3(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec3 murmurHash3(uvec4 src) {
+	const uint M = 0x5bd1e995u;
+	uvec3 h = uvec3(1190494759u, 2147483647u, 3559788179u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h *= M;
+	h ^= src.w;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 3 outputs, 4 inputs
+vec3 random3(vec4 src) {
+	uvec3 h = murmurHash3(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec4 murmurHash4(uint src) {
+	const uint M = 0x5bd1e995u;
+	uvec4 h = uvec4(1190494759u, 2147483647u, 3559788179u, 179424673u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 4 outputs, 1 input
+vec4 random4(float src) {
+	uvec4 h = murmurHash4(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec4 murmurHash4(uvec2 src) {
+	const uint M = 0x5bd1e995u;
+	uvec4 h = uvec4(1190494759u, 2147483647u, 3559788179u, 179424673u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 4 outputs, 2 inputs
+vec4 random4(vec2 src) {
+	uvec4 h = murmurHash4(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec4 murmurHash4(uvec3 src) {
+	const uint M = 0x5bd1e995u;
+	uvec4 h = uvec4(1190494759u, 2147483647u, 3559788179u, 179424673u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 4 outputs, 3 inputs
+vec4 random4(vec3 src) {
+	uvec4 h = murmurHash4(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
+//------------------------------------------------------------------------------
+
+uvec4 murmurHash4(uvec4 src) {
+	const uint M = 0x5bd1e995u;
+	uvec4 h = uvec4(1190494759u, 2147483647u, 3559788179u, 179424673u);
+	src *= M;
+	src ^= src >> 24u;
+	src *= M;
+	h *= M;
+	h ^= src.x;
+	h *= M;
+	h ^= src.y;
+	h *= M;
+	h ^= src.z;
+	h *= M;
+	h ^= src.w;
+	h ^= h >> 13u;
+	h *= M;
+	h ^= h >> 15u;
+	return h;
+}
+
+// 4 outputs, 4 inputs
+vec4 random4(vec4 src) {
+	uvec4 h = murmurHash4(floatBitsToUint(src));
+	return uintBitsToFloat(h & 0x007fffffu | 0x3f800000u) - 1.0;
+}
+
 out vec4 fragColor;
 #define PI 3.14159265359
 
@@ -46,6 +446,26 @@ layout(std140, binding = 0) uniform object_buffer {
 	Object objects[10];
 };
 
+mat3 GetTangentSpace(vec3 normal, vec3 seed) {
+    // Choose a helper vector for the cross product
+	vec3 helper = random3(seed * normal);
+
+    // Generate vectors
+	vec3 tangent = normalize(cross(normal, helper));
+	vec3 binormal = normalize(cross(normal, tangent));
+	return mat3(tangent, binormal, normal);
+}
+
+vec3 SampleHemisphere(vec3 normal, vec3 seed) {
+    // Uniformly sample hemisphere direction
+	float cosTheta = random(normal * seed * u_time);
+	float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+	float phi = 2 * PI * random(normal * seed * u_time * 2.f);
+	vec3 tangentSpaceDir = vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+    // Transform direction to world space
+	return tangentSpaceDir * GetTangentSpace(normal, seed);
+}
+
 mat3 rotationX(float angle) {
 	float s = sin(angle);
 	float c = cos(angle);
@@ -67,17 +487,8 @@ mat3 rotationZ(float angle) {
 	return mat3(c, s, 0.0, -s, c, 0.0, 0.0, 0.0, 1.0);
 }
 
-vec2 random2(vec2 p) {
-	return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
-}
-
-// 2D Random
-float random(vec2 seed) {
-	return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453123);
-}
-
 mat3 randomRot(float scatter, vec3 seed) {
-	return rotationX((random(seed.xy) - 0.5f) * scatter) * rotationY((random(seed.yz) - 0.5f) * scatter) * rotationZ((random(seed.zx) - 0.5f) * scatter);
+	return rotationX((random(seed.xyz) - 0.5f) * 2.f * scatter) * rotationY((random(seed.yzx) - 0.5f) * 2.f * scatter) * rotationZ((random(seed.zxy) - 0.5f) * 2.f * scatter);
 }
 
 vec4 sampleSkyBox(vec3 direction) {
@@ -182,7 +593,6 @@ Hit Trace(Ray ray) {
 	Hit bestHit;
 	bestHit.dist = 1e10;
 	bestHit.object = Object(vec4(0), vec4(0), sampleSkyBox(ray.direction), 0, -1); // skybox
-	bestHit.normal = vec3(1, 0, 0);
 
 	for(int i = 0; i < n; i++) /**/
 		if(intersectObject(objects[i], ray, bestHit))
@@ -202,42 +612,22 @@ vec3 render(vec2 fc) {
 	Hit hit = Trace(ray);
 
 	vec3 outColor = vec3(0);
-	vec3 colorMultiplier = vec3(1);
+	vec3 rayStrength = vec3(1);
 
 	for(int i = 0; i < 10; i++) {
-
-		if(hit.object.type == -1 || hit.object.color.w > 0.5) {
-			outColor += hit.object.color.xyz * colorMultiplier;
+		if(hit.object.type == -1) {
+			outColor += hit.object.color.xyz * rayStrength;
 			break;
 		}
 
-		vec3 refl = reflect(ray.direction, hit.normal);
+		vec3 refl = hit.normal * randomRot(PI, hit.normal * hit.position);//SampleHemisphere(hit.normal, hit.position);
 
-		float scatter = PI * (1.f - hit.object.smoothness);
-		refl *= randomRot(scatter, hit.position);
+		//outColor += hit.object.color.xyz * rayStrength;
 
-		//vec3 direction = lightDir * randomRot(0.03, refl);
-
-		//Hit light = Trace(Ray(hit.position - direction * 5e-2, -direction));
+		rayStrength *= 2 * hit.object.color.xyz * clamp(dot(refl, hit.normal), 0.f, 1.f);
 
 		ray = Ray(hit.position + refl * eps, refl);
-		Hit newhit = Trace(ray);
-
-		// float diffuse = 0.f;
-		// float specular = 0.f;
-
-		// if(light.object == -1)
-		// 	diffuse = max(dot(normal, -lightDir), 0.f);
-
-		// if(newhit.object == -1)
-		// 	specular = pow(max(dot(refl, -lightDir), 0.f), 8.f * objects[hit.object].smoothness);
-
-		float lightMultiplier = 0;//min(mix(diffuse, specular, 0.1 + objects[hit.object].smoothness * 0.8), 1);
-
-		outColor += hit.object.color.xyz * colorMultiplier * lightMultiplier;
-		colorMultiplier *= 0.5 * (mix(hit.object.color.xyz, vec3(1.f), hit.object.smoothness * 0.5));
-
-		hit = newhit;
+		hit = Trace(ray);
 	}
 
 	return outColor;

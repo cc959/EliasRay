@@ -19,49 +19,38 @@ void setup(Camera &camera, vector<Object> &objects, int frame)
 
     float time = frame / float(30);
 
-    camera.Position = vec3(sin(time * 0.5f) * 30, 12.5 + sin(time * 1.f) * 2.5, cos(time * 0.5f) * 30);
+    camera.Position = vec3(sin(time * 20.f) * 3, 1, cos(time * 20.f) * 3);
 
     float height = 12.5;
 
     //  camera.Position = vec3(10, 15, 10);
-    camera.Rotation = quatLookAt(normalize(camera.Position - vec3(0, 5, 0)), vec3(0, 1, 0));
+    camera.Rotation = quatLookAt(normalize(camera.Position - vec3(0, 0, 0)), vec3(0, 1, 0));
     camera.fov = 80;
 
-    for (float x = -5; x <= 5; x++)
-        for (float y = -5; y <= 5; y++)
-        {
+    Object ball;
+    ball.data = 0u;
+    ball.position = vec4(0, 1, 0, 0);
+    ball.size = vec4(1, 0, 0, 0);
+    ball.color = vec4(0.5, 0.5, 0.5, 0);
+    ball.smoothness = 0.8;
 
-            float h = height + sin(x + 100 * y) * 5;
+    objects.push_back(ball);
 
-            float size = 0.85f + 0.25f * cos(x * 453 - y * 88);
+    ball.color = vec4(1, 0, 0, 0);
+    ball.size /= 2;
+    ball.position += vec4(1, -0.5, 1, 0);
+    ball.smoothness = 1;
 
-            Object balls;
-            balls.position = vec4(4.f * x, size + h - pow(mod(time * 6 + (sin(x) * 100.f + sin(y) * 50.f) * 4 + sqrt(h), 2.f * sqrt(h)) - sqrt(h), 2.f), 4.f * y, 0);
-            balls.color = vec4(rgbColor(vec3(mod(x * 9538.f + y * 234834.f, 360.f), 1, 1)) * 5.f, usin(x * 4565.f + y * 6456.f) * 0.55);
-            balls.size = vec4(size / 2, size, size / 2.f, 0);
-            balls.smoothness = 0.95 + cos(x * 32 + y * 65) * 0.05;
-            balls.setType(int(sin(2 * x + 5 * y) + 1));
-
-            objects.push_back(balls);
-        }
+    objects.push_back(ball);
 
     Object plane;
     plane.data = 2u;
     plane.position = vec4(0, 0, 0, 0);
     plane.size = vec4(0, 1, 0, 0); // normal
-    plane.color = vec4(0, 0, 0, 0);
-    plane.smoothness = 0.95 + sin(time * 2) * 0.05;
+    plane.color = vec4(1, 1, 1, 0);
+    plane.smoothness = 0; // 0.95 + sin(time * 2) * 0.05;
 
     objects.push_back(plane);
-
-    // Object cube;
-    // cube.data = 1u;
-    // cube.position = vec4(0, 0, 0, 0);
-    // cube.size = vec4(6, 6, 6, 0);
-    // cube.color = vec4(1, 0, 0, 0);
-    // cube.smoothness = 0.5;
-
-    // objects.push_back(cube);
 }
 
 int main()
@@ -71,8 +60,8 @@ int main()
 
     system("rm ./Render/*.jpg");
 
-    Renderer r(7680, 4320, setup);
-    r.Render(0, 10, 8);
+    Renderer r(1920, 1080, setup);
+    r.Render(0, 10, 1000);
 
     system("ffmpeg -y -framerate 30 -i ./Render/image%1d.jpg ./output.mp4");
 }

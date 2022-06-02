@@ -60,7 +60,7 @@ void Renderer::Render(int startFrame, int endFrame, int samples)
     vec3 lightDir(0.5, -1, 0.2);
     lightDir = normalize(lightDir);
 
-    Texture skybox("res/Shang.png");
+    Texture skybox("res/SkyBox.jpg");
     skybox.SetFilters(GL_LINEAR, GL_LINEAR);
 
     GLuint vertexbuffer;

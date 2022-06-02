@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon May 30 12:51:42 2022
+# Make data base, printed on Thu Jun  2 17:43:07 2022
 
 # Variables
 
@@ -21,7 +21,7 @@ NO_AT_BRIDGE = 1
 # environment
 SNAP_INSTANCE_KEY = 
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-9e192aeb-a675-44af-a5a7-28410a90ce6b.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d644493b-0b6b-41d7-8d03-4d869356c0be.sock
 # environment
 LC_NAME = en_US.UTF-8
 # environment
@@ -81,7 +81,7 @@ LESS_TERMCAP_md = [01;32m
 # default
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
-GNOME_TERMINAL_SERVICE = :1.1572
+GNOME_TERMINAL_SERVICE = :1.73
 # makefile
 MAKEFLAGS = pqrR
 # environment
@@ -117,7 +117,7 @@ SNAP_REEXEC =
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 15800
+VSCODE_PID = 1845
 # environment
 MOZ_ENABLE_WAYLAND = 1
 # makefile (from 'Makefile', line 1)
@@ -131,7 +131,7 @@ CUDA_PATH = /opt/cuda
 # environment
 __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = 1
 # environment
-SESSION_MANAGER = local/elias-g33579:@/tmp/.ICE-unix/1225,unix/elias-g33579:/tmp/.ICE-unix/1225
+SESSION_MANAGER = local/elias-g33579:@/tmp/.ICE-unix/1221,unix/elias-g33579:/tmp/.ICE-unix/1221
 # automatic
 *F = $(notdir $*)
 # environment
@@ -161,7 +161,7 @@ objects = main.o Camera.o ComputeShader.o GlStorage.o Light.o Mesh.o Shader.o Te
 # environment
 SHLVL = 3
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/0bc9bd8b_1ec6_4b93_bdf4_16f5f5de62f9
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/3aa54151_0ed3_4bb9_bc3f_29eaef9f85c1
 # environment
 MAKELEVEL := 0
 # default
@@ -223,7 +223,7 @@ SNAP_ARCH = amd64
 # makefile
 .DEFAULT_GOAL := build
 # environment
-SYSTEMD_EXEC_PID = 1424
+SYSTEMD_EXEC_PID = 1436
 # environment
 EDITOR = /usr/bin/nano
 # environment
@@ -290,7 +290,6 @@ ELECTRON_NO_ATTACH_CONSOLE = 1
 VTE_VERSION = 6800
 # environment
 SNAP_COMMON = /var/snap/code/common
- 
 # environment
 LS_OPTIONS = --color=auto
 # makefile (from 'Makefile', line 4)
@@ -301,6 +300,7 @@ CXXFLAGS = -g -I ./ $(args) -std=c++20
 CXX = gcc 
 # environment
 SNAP_USER_DATA = /home/elias/snap/code/97
+ 
 # environment
 XDG_MENU_PREFIX = gnome-
 # environment
@@ -522,6 +522,6 @@ Shader.o: Shader.cpp
 # strcache performance: lookups = 123 / hit rate = 44%
 # hash-table stats:
 # Load=68/8192=1%, Rehash=0, Collisions=0/123=0%
-# Finished Make data base on Mon May 30 12:51:42 2022
+# Finished Make data base on Thu Jun  2 17:43:07 2022
 
  
