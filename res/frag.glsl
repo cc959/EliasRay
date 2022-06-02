@@ -614,13 +614,13 @@ vec3 render(vec2 fc) {
 	vec3 outColor = vec3(0);
 	vec3 rayStrength = vec3(1);
 
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < 5; i++) {
 		if(hit.object.type == -1) {
 			outColor += hit.object.color.xyz * rayStrength;
 			break;
 		}
 
-		vec3 refl = hit.normal * randomRot(PI, hit.normal * hit.position);//SampleHemisphere(hit.normal, hit.position);
+		vec3 refl = hit.normal * randomRot(PI, hit.normal + hit.position);//SampleHemisphere(hit.normal, hit.position);
 
 		//outColor += hit.object.color.xyz * rayStrength;
 

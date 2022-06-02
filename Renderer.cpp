@@ -120,9 +120,12 @@ void Renderer::Render(int startFrame, int endFrame, int samples)
         auto printProgress = [&](int sample)
         {
             cout << "\rFrame " << frame << " ";
-            for (int i = 0; i < samples; i++)
+
+            float d = std::min(50.f / float(samples), 1.f);
+
+            for (int i = 0; i < samples * d; i++)
             {
-                if (i < sample)
+                if (i < sample * d)
                     cout << "#";
                 else
                     cout << ".";
@@ -153,7 +156,7 @@ void Renderer::Render(int startFrame, int endFrame, int samples)
         out.flipVertically();
         out.saveToFile("Render/image" + to_string(frame) + ".jpg");
 
-        cout << "\n";
+        // cout << "\n";
     }
 
     glDeleteBuffers(1, &vertexbuffer);

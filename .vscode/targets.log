@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun  2 17:43:07 2022
+# Make data base, printed on Thu Jun  2 20:03:02 2022
 
 # Variables
 
@@ -21,7 +21,7 @@ NO_AT_BRIDGE = 1
 # environment
 SNAP_INSTANCE_KEY = 
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d644493b-0b6b-41d7-8d03-4d869356c0be.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-1675b23d-81a2-40c6-bdd2-0dd5c9306232.sock
 # environment
 LC_NAME = en_US.UTF-8
 # environment
@@ -81,7 +81,7 @@ LESS_TERMCAP_md = [01;32m
 # default
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
-GNOME_TERMINAL_SERVICE = :1.73
+GNOME_TERMINAL_SERVICE = :1.2267
 # makefile
 MAKEFLAGS = pqrR
 # environment
@@ -117,11 +117,11 @@ SNAP_REEXEC =
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 1845
+VSCODE_PID = 29727
 # environment
 MOZ_ENABLE_WAYLAND = 1
 # makefile (from 'Makefile', line 1)
-args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3
+args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20
 # environment
 XDG_SESSION_TYPE = x11
 # environment
@@ -161,7 +161,7 @@ objects = main.o Camera.o ComputeShader.o GlStorage.o Light.o Mesh.o Shader.o Te
 # environment
 SHLVL = 3
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/3aa54151_0ed3_4bb9_bc3f_29eaef9f85c1
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/677c1b91_b428_4000_ac10_3254698db869
 # environment
 MAKELEVEL := 0
 # default
@@ -300,12 +300,12 @@ CXXFLAGS = -g -I ./ $(args) -std=c++20
 CXX = gcc 
 # environment
 SNAP_USER_DATA = /home/elias/snap/code/97
- 
 # environment
 XDG_MENU_PREFIX = gnome-
 # environment
 GDMSESSION = gnome
 # environment
+ 
 PKGFILE_PROMPT_INSTALL_MISSING = 1
 # environment
 LC_IDENTIFICATION = en_US.UTF-8
@@ -375,7 +375,7 @@ Camera.o: Camera.cpp
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-28 11:51:30.0855119
+#  Last modified 2022-06-02 19:59:49.4568927
 #  File has been updated.
 #  Successfully updated.
 
@@ -522,6 +522,6 @@ Shader.o: Shader.cpp
 # strcache performance: lookups = 123 / hit rate = 44%
 # hash-table stats:
 # Load=68/8192=1%, Rehash=0, Collisions=0/123=0%
-# Finished Make data base on Thu Jun  2 17:43:07 2022
+# Finished Make data base on Thu Jun  2 20:03:02 2022
 
  

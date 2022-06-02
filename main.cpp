@@ -14,12 +14,14 @@ float ucos(float x)
     return (cos(x) + 1.f) / 2.f;
 }
 
+vector<Object> spheres;
+
 void setup(Camera &camera, vector<Object> &objects, int frame)
 {
 
     float time = frame / float(30);
 
-    camera.Position = vec3(sin(time * 20.f) * 3, 1, cos(time * 20.f) * 3);
+    camera.Position = vec3(sin(time * 20.f) * 7.5, 7.5, cos(time * 20.f) * 7.5);
 
     float height = 12.5;
 
@@ -27,21 +29,8 @@ void setup(Camera &camera, vector<Object> &objects, int frame)
     camera.Rotation = quatLookAt(normalize(camera.Position - vec3(0, 0, 0)), vec3(0, 1, 0));
     camera.fov = 80;
 
-    Object ball;
-    ball.data = 0u;
-    ball.position = vec4(0, 1, 0, 0);
-    ball.size = vec4(1, 0, 0, 0);
-    ball.color = vec4(0.5, 0.5, 0.5, 0);
-    ball.smoothness = 0.8;
-
-    objects.push_back(ball);
-
-    ball.color = vec4(1, 0, 0, 0);
-    ball.size /= 2;
-    ball.position += vec4(1, -0.5, 1, 0);
-    ball.smoothness = 1;
-
-    objects.push_back(ball);
+    for (Object sphere : spheres)
+        objects.push_back(sphere);
 
     Object plane;
     plane.data = 2u;
@@ -53,12 +42,45 @@ void setup(Camera &camera, vector<Object> &objects, int frame)
     objects.push_back(plane);
 }
 
+void generateSpheres(int n, float placementRadius)
+{
+
+    while (spheres.size() < n)
+    {
+        float angle = rand() / float(RAND_MAX) * 2 * pi<float>();
+        float dist = rand() / float(RAND_MAX) * placementRadius;
+        float radius = rand() / float(RAND_MAX) * 3.f;
+
+        vec3 position(cos(angle) * dist, radius, sin(angle) * dist);
+
+        Object sphere;
+
+        for (Object other : spheres)
+            if (length(position - vec3(other.position)) < radius + other.size.x)
+                goto reject;
+
+        sphere.data = 0u;
+        sphere.position = vec4(position, 0);
+        sphere.size = vec4(radius, 0, 0, 0);
+        sphere.color = vec4(rgbColor(vec3(rand() / float(RAND_MAX) * 360.f, 1, 1)), 0);
+        sphere.smoothness = 0;
+
+        spheres.push_back(sphere);
+
+    reject:
+        continue;
+    }
+}
+
 int main()
 {
 
     system("mkdir ./Render");
 
     system("rm ./Render/*.jpg");
+
+    srand(0);
+    generateSpheres(20, 5);
 
     Renderer r(1920, 1080, setup);
     r.Render(0, 10, 1000);
