@@ -26,18 +26,18 @@ void setup(Camera &camera, vector<Object> &objects, int frame)
     float height = 12.5;
 
     //  camera.Position = vec3(10, 15, 10);
-    camera.Rotation = quatLookAt(normalize(camera.Position - vec3(0, 0, 0)), vec3(0, 1, 0));
+    camera.Rotation = quatLookAt(normalize(camera.Position), vec3(0, 1, 0));
     camera.fov = 80;
 
     for (Object sphere : spheres)
         objects.push_back(sphere);
 
     Object plane;
-    plane.data = 2u;
     plane.position = vec4(0, 0, 0, 0);
     plane.size = vec4(0, 1, 0, 0); // normal
     plane.color = vec4(1, 1, 1, 0);
-    plane.smoothness = 0; // 0.95 + sin(time * 2) * 0.05;
+    plane.specular = vec4(0); // 0.95 + sin(time * 2) * 0.05;
+    plane.type = 2u;
 
     objects.push_back(plane);
 }
@@ -59,11 +59,11 @@ void generateSpheres(int n, float placementRadius)
             if (length(position - vec3(other.position)) < radius + other.size.x)
                 goto reject;
 
-        sphere.data = 0u;
+        sphere.type = 0u;
         sphere.position = vec4(position, 0);
         sphere.size = vec4(radius, 0, 0, 0);
         sphere.color = vec4(rgbColor(vec3(rand() / float(RAND_MAX) * 360.f, 1, 1)), 0);
-        sphere.smoothness = 0;
+        sphere.specular = vec4(0); // sphere.color;
 
         spheres.push_back(sphere);
 

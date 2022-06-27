@@ -4,18 +4,11 @@ using namespace glm;
 
 class Object
 {
-	public:
+public:
     vec4 position = vec4(0, 0, 0, 0);
     vec4 size = vec4(1, 1, 1, 0);
-
     vec4 color = vec4(1, 1, 1, 0);
-    float smoothness;
-    uint data = 0;
-    int padA = 0;
-    int padB = 0;
-
-    void setType(int type);
-    void makeMin();
-    void makeMax();
-    void setNegative(bool b);
+    vec4 specular = vec4(0, 0, 0, 0);
+    uint type = 0;
+    int pad[3];
 };

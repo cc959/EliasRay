@@ -88,6 +88,8 @@
 		"latch": "cpp",
 		"semaphore": "cpp",
 		"syncstream": "cpp",
-		"__nullptr": "cpp"
+		"__nullptr": "cpp",
+		"spanstream": "cpp",
+		"*.inc": "cpp"
 	}
 }

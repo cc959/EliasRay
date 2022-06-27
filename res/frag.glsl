@@ -428,11 +428,12 @@ struct Ray {
 };
 
 struct Object {
-	vec4 position;
-	vec4 size;
-	vec4 color;
-	float smoothness;
-	int type;
+	vec3 position;
+	vec3 size;
+	vec3 color;
+	vec3 specular;
+	int pad;
+	uint type;
 };
 
 struct Hit {
@@ -443,12 +444,12 @@ struct Hit {
 };
 
 layout(std140, binding = 0) uniform object_buffer {
-	Object objects[10];
+	Object objects[20];
 };
 
 mat3 GetTangentSpace(vec3 normal, vec3 seed) {
     // Choose a helper vector for the cross product
-	vec3 helper = random3(seed * normal);
+	vec3 helper = random3(seed);
 
     // Generate vectors
 	vec3 tangent = normalize(cross(normal, helper));
@@ -458,9 +459,9 @@ mat3 GetTangentSpace(vec3 normal, vec3 seed) {
 
 vec3 SampleHemisphere(vec3 normal, vec3 seed) {
     // Uniformly sample hemisphere direction
-	float cosTheta = random(normal * seed * u_time);
+	float cosTheta = random(seed);
 	float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
-	float phi = 2 * PI * random(normal * seed * u_time * 2.f);
+	float phi = 2 * PI * random(seed * 2.f);
 	vec3 tangentSpaceDir = vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
     // Transform direction to world space
 	return tangentSpaceDir * GetTangentSpace(normal, seed);
@@ -491,12 +492,12 @@ mat3 randomRot(float scatter, vec3 seed) {
 	return rotationX((random(seed.xyz) - 0.5f) * 2.f * scatter) * rotationY((random(seed.yzx) - 0.5f) * 2.f * scatter) * rotationZ((random(seed.zxy) - 0.5f) * 2.f * scatter);
 }
 
-vec4 sampleSkyBox(vec3 direction) {
+vec3 sampleSkyBox(vec3 direction) {
 	// Sample the skybox and write it
 	float theta = acos(direction.y) / -PI;
 	float phi = atan(direction.x, -direction.z) / -PI * 0.5f;
 
-	return vec4(texture(skybox, vec2(phi, theta)).xyz, 0);
+	return texture(skybox, vec2(phi, theta)).xyz * 1.3;
 }
 
 bool intersectSphere(vec3 c, float r, Ray ray, inout Hit bestHit) {
@@ -574,7 +575,6 @@ bool intersectObject(Object object, Ray ray, inout Hit bestHit) {
 		return intersectBox(object.position.xyz, object.size.xyz, ray, bestHit);
 	if(object.type == 2)
 		return intersectPlane(object.position.xyz, object.size.xyz, ray, bestHit);
-
 }
 
 Ray CreateCameraRay(vec2 uv) {
@@ -583,7 +583,7 @@ Ray CreateCameraRay(vec2 uv) {
 
     // Invert the perspective projection of the view-space position
 	vec3 direction = (_CameraInverseProjection * vec4(uv, 0.0f, 1.0f)).xyz;
-    // Transform the direction from camera to world space and normalize
+    // Transform the direction from camera to world space and normalize0
 	direction = (_CameraToWorld * vec4(direction, 0.0f)).xyz;
 	direction = normalize(direction);
 	return Ray(origin, direction);
@@ -592,7 +592,8 @@ Ray CreateCameraRay(vec2 uv) {
 Hit Trace(Ray ray) {
 	Hit bestHit;
 	bestHit.dist = 1e10;
-	bestHit.object = Object(vec4(0), vec4(0), sampleSkyBox(ray.direction), 0, -1); // skybox
+	bestHit.object.type = -1;
+	bestHit.object.color = sampleSkyBox(ray.direction);
 
 	for(int i = 0; i < n; i++) /**/
 		if(intersectObject(objects[i], ray, bestHit))
@@ -601,7 +602,7 @@ Hit Trace(Ray ray) {
 	return bestHit;
 }
 
-const float eps = 1e-4;
+const float eps = 1e-3;
 
 vec3 render(vec2 fc) {
 
@@ -616,17 +617,22 @@ vec3 render(vec2 fc) {
 
 	for(int i = 0; i < 5; i++) {
 		if(hit.object.type == -1) {
-			outColor += hit.object.color.xyz * rayStrength;
+			outColor += hit.object.color * rayStrength;
 			break;
 		}
 
-		vec3 refl = hit.normal * randomRot(PI, hit.normal + hit.position);//SampleHemisphere(hit.normal, hit.position);
+		ray.origin = hit.position + hit.normal * eps;
 
-		//outColor += hit.object.color.xyz * rayStrength;
+		vec3 reflected = reflect(ray.direction, hit.normal);
+		ray.direction = hit.normal * randomRot(PI, hit.position + hit.normal); //SampleHemisphere(hit.normal, hit.position + hit.normal);//
 
-		rayStrength *= 2 * hit.object.color.xyz * clamp(dot(refl, hit.normal), 0.f, 1.f);
+		vec3 diffuse = 2 * min(1 - hit.object.specular, hit.object.color);
+		float alpha = 15.0;
 
-		ray = Ray(hit.position + refl * eps, refl);
+		vec3 specular = hit.object.specular * (alpha + 2) * pow(clamp(dot(ray.direction, reflected), 0.f, 1.f), alpha);
+
+		rayStrength *= (diffuse + specular) * clamp(dot(hit.normal, ray.direction), 0.f, 1.f);
+
 		hit = Trace(ray);
 	}
 

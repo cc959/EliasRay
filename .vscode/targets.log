@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun  2 20:03:02 2022
+# Make data base, printed on Tue Jun 14 18:16:31 2022
 
 # Variables
 
@@ -21,7 +21,9 @@ NO_AT_BRIDGE = 1
 # environment
 SNAP_INSTANCE_KEY = 
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-1675b23d-81a2-40c6-bdd2-0dd5c9306232.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-1827dcfc-3252-43d8-9c05-626405af0397.sock
+# environment
+GNOME_KEYRING_CONTROL = /run/user/1000/keyring
 # environment
 LC_NAME = en_US.UTF-8
 # environment
@@ -47,7 +49,7 @@ __GLX_VENDOR_LIBRARY_NAME = nvidia
 # environment
 SNAP_INSTANCE_NAME = code
 # environment
-GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+GDK_PIXBUF_MODULEDIR = /snap/code/98/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -69,7 +71,7 @@ VSCODE_LOG_STACK = false
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = /home/elias/.config/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CODE_CACHE_PATH = /home/elias/.config/Code/CachedData/4af164ea3a06f701fe3e89a2bcbb421d2026b68f
 # environment
 LANG = C
 # environment
@@ -81,7 +83,7 @@ LESS_TERMCAP_md = [01;32m
 # default
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
-GNOME_TERMINAL_SERVICE = :1.2267
+GNOME_TERMINAL_SERVICE = :1.176
 # makefile
 MAKEFLAGS = pqrR
 # environment
@@ -117,11 +119,11 @@ SNAP_REEXEC =
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 29727
+VSCODE_PID = 8478
 # environment
 MOZ_ENABLE_WAYLAND = 1
 # makefile (from 'Makefile', line 1)
-args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20
+args = -lGL -lGLEW -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -std=c++20 -O3
 # environment
 XDG_SESSION_TYPE = x11
 # environment
@@ -131,7 +133,7 @@ CUDA_PATH = /opt/cuda
 # environment
 __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = 1
 # environment
-SESSION_MANAGER = local/elias-g33579:@/tmp/.ICE-unix/1221,unix/elias-g33579:/tmp/.ICE-unix/1221
+SESSION_MANAGER = local/elias-g33579:@/tmp/.ICE-unix/1194,unix/elias-g33579:/tmp/.ICE-unix/1194
 # automatic
 *F = $(notdir $*)
 # environment
@@ -161,7 +163,7 @@ objects = main.o Camera.o ComputeShader.o GlStorage.o Light.o Mesh.o Shader.o Te
 # environment
 SHLVL = 3
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/677c1b91_b428_4000_ac10_3254698db869
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/7624df5c_8eac_4ee9_bfcf_f4765603e5ea
 # environment
 MAKELEVEL := 0
 # default
@@ -187,11 +189,11 @@ LC_TIME = en_US.UTF-8
 # environment
 LESS_TERMCAP_mb = [01;32m
 # environment
-SNAP = /snap/code/97
+SNAP = /snap/code/98
 # environment
 __NV_PRIME_RENDER_OFFLOAD = 1
 # environment
-SNAP_REVISION = 97
+SNAP_REVISION = 98
 # environment
 SNAP_REAL_HOME = /home/elias
 # environment
@@ -223,7 +225,7 @@ SNAP_ARCH = amd64
 # makefile
 .DEFAULT_GOAL := build
 # environment
-SYSTEMD_EXEC_PID = 1436
+SYSTEMD_EXEC_PID = 1397
 # environment
 EDITOR = /usr/bin/nano
 # environment
@@ -235,7 +237,7 @@ MAKE_VERSION := 4.3
 # environment
 DISABLE_WAYLAND = 1
 # environment
-SNAP_DATA = /var/snap/code/97
+SNAP_DATA = /var/snap/code/98
 # environment
 SNAP_CONTEXT = 2NBjVsx4QOCBPgWHmjNPxuOcJk2hqqiQDADjzUpEVDM7NkfdbGBx
 # environment
@@ -263,19 +265,19 @@ QT_IM_MODULE = ibus
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-84b63c51-1.67.2-main.sock
+VSCODE_IPC_HOOK = /run/user/1000/vscode-84b63c51-1.68.0-main.sock
 # environment
 TERM = xterm-256color
 # environment
 SNAP_NAME = code
 # environment
-GSETTINGS_SCHEMA_DIR = /snap/code/97/usr/share/glib-2.0/schemas
+GSETTINGS_SCHEMA_DIR = /snap/code/98/usr/share/glib-2.0/schemas
 # default
 .RECIPEPREFIX := 
 # automatic
 <F = $(notdir $<)
 # environment
-SNAP_VERSION = c3511e6c
+SNAP_VERSION = 4af164ea
 # default
 SUFFIXES := 
 # environment
@@ -288,6 +290,7 @@ VSCODE_CLI = 1
 ELECTRON_NO_ATTACH_CONSOLE = 1
 # environment
 VTE_VERSION = 6800
+ 
 # environment
 SNAP_COMMON = /var/snap/code/common
 # environment
@@ -299,20 +302,19 @@ CXXFLAGS = -g -I ./ $(args) -std=c++20
 # makefile (from 'Makefile', line 3)
 CXX = gcc 
 # environment
-SNAP_USER_DATA = /home/elias/snap/code/97
+SNAP_USER_DATA = /home/elias/snap/code/98
 # environment
 XDG_MENU_PREFIX = gnome-
 # environment
 GDMSESSION = gnome
 # environment
- 
 PKGFILE_PROMPT_INSTALL_MISSING = 1
 # environment
 LC_IDENTIFICATION = en_US.UTF-8
 # environment
 SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
 # variable set hash-table stats:
-# Load=149/1024=15%, Rehash=0, Collisions=24/181=13%
+# Load=150/1024=15%, Rehash=0, Collisions=25/182=14%
 
 # Pattern-specific Variable Values
 
@@ -375,7 +377,7 @@ Camera.o: Camera.cpp
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-02 19:59:49.4568927
+#  Last modified 2022-06-03 22:15:52.2223005
 #  File has been updated.
 #  Successfully updated.
 
@@ -522,6 +524,6 @@ Shader.o: Shader.cpp
 # strcache performance: lookups = 123 / hit rate = 44%
 # hash-table stats:
 # Load=68/8192=1%, Rehash=0, Collisions=0/123=0%
-# Finished Make data base on Thu Jun  2 20:03:02 2022
+# Finished Make data base on Tue Jun 14 18:16:31 2022
 
  
